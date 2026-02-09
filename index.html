@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifasPay - Ganhe Dinheiro com Rifas!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        :root {
+            --primary: #1a237e;
+            --primary-dark: #311b92;
+            --secondary: #00c853;
+            --accent: #ff4081;
+            --danger: #f44336;
+            --warning: #ff9800;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Logo e Header */
+        .logo-container {
+            text-align: center;
+            padding: 30px 20px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 0 0 25px 25px;
+            color: white;
+        }
+        
+        .logo-circle {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border: 5px solid var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-circle::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="28" font-weight="bold" fill="%231a237e">RP</text></svg>') center/contain no-repeat;
+        }
+        
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .logo-subtitle {
+            opacity: 0.8;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        /* Tela de Login */
+        .login-screen {
+            padding: 30px 20px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            border: 1px solid #eee;
+        }
+        
+        .login-title {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(26, 35, 126, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #00e676 100%);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent) 0%, #f50057 100%);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+        }
+        
+        .login-divider::before,
+        .login-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+        
+        .login-divider span {
+            padding: 0 15px;
+        }
+        
+        .referral-code {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 2px dashed var(--warning);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 25px;
+            position: relative;
+        }
+        
+        .referral-label {
+            font-size: 12px;
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .referral-value {
+            font-size: 18px;
+            font-weight: 900;
+            color: #333;
+            letter-spacing: 2px;
+        }
+        
+        /* Conteúdo Principal */
+        .main-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), #64dd17);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-right: 12px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .balance-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 900;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Nav Menu */
+        .nav-menu {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+            padding: 12px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(26, 35, 126, 0.1);
+        }
+        
+        /* Pages */
+        .page {
+            display: none;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+        
+        /* Modal Admin */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .admin-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            animation: slideUp 0.3s;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-container {
+                border-radius: 0;
+            }
+            
+            .logo-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-text {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-circle"></div>
+            <div class="logo-text">RifasPay</div>
+            <div class="logo-subtitle">Ganhe dinheiro com rifas e desafios!</div>
+        </div>
+        
+        <!-- Tela de Login -->
+        <div id="login-screen" class="login-screen">
+            <div class="login-box">
+                <h2 class="login-title">Entrar no RifasPay</h2>
+                
+                <div class="input-group">
+                    <label class="input-label">E-mail</label>
+                    <input type="email" id="login-email" class="input-field" placeholder="seu@email.com">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Senha</label>
+                    <input type="password" id="login-password" class="input-field" placeholder="••••••••">
+                </div>
+                
+                <button class="btn" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Entrar na Conta
+                </button>
+                
+                <div class="login-divider">
+                    <span>OU</span>
+                </div>
+                
+                <button class="btn btn-success" onclick="showRegister()">
+                    <i class="fas fa-user-plus"></i> Criar Nova Conta
+                </button>
+                
+                <!-- Referral Code (após 7 toques aparece) -->
+                <div id="referral-section" style="display: none;" class="referral-code">
+                    <div class="referral-label">Código de Convite Secreto</div>
+                    <div class="referral-value" id="secret-code">ADMIN2024</div>
+                    <small style="color: #666;">Use este código para acesso especial</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tela de Registro -->
+        <div id="register-screen" class="login-screen" style="display: none;">
+            <div class="login-box">
+                <h2 class="login-title">Criar Conta</h2>
+                
+                <div class="input-group">
+                    <label class="input-label">Nome Completo</label>
+                    <input type="text" id="register-name" class="input-field" placeholder="Seu nome">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">E-mail</label>
+                    <input type="email" id="register-email" class="input-field" placeholder="seu@email.com">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Senha (mínimo 6 caracteres)</label>
+                    <input type="password" id="register-password" class="input-field" placeholder="••••••••">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Código de Convite (opcional)</label>
+                    <input type="text" id="register-referral" class="input-field" placeholder="Código do amigo">
+                </div>
+                
+                <button class="btn btn-success" onclick="register()">
+                    <i class="fas fa-check"></i> Criar Minha Conta
+                </button>
+                
+                <button class="btn btn-secondary" onclick="showLogin()" style="margin-top: 15px;">
+                    <i class="fas fa-arrow-left"></i> Voltar para Login
+                </button>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal (após login) -->
+        <div id="main-content" class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="user-info">
+                    <div class="profile">
+                        <div class="profile-img" id="user-avatar">U</div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 18px;" id="user-name">Usuário</div>
+                            <div style="font-size: 14px; opacity: 0.8;">ID: <span id="user-id">---</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <i class="fas fa-bell" style="font-size: 22px; opacity: 0.9; cursor: pointer;" onclick="showNotifications()"></i>
+                    </div>
+                </div>
+                
+                <div class="balance-card">
+                    <div style="font-size: 14px; opacity: 0.9;">SALDO DISPONÍVEL</div>
+                    <div class="balance-amount" id="user-balance">R$ 0,00</div>
+                    <button class="btn btn-success" onclick="showDepositModal()" style="margin-top: 10px; padding: 10px 20px; font-size: 14px;">
+                        <i class="fas fa-plus-circle"></i> Depositar via PIX
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Página Principal -->
+            <div id="home-page" class="page active">
+                <div style="margin: 20px 0 30px;">
+                    <h2 style="color: var(--primary); font-size: 24px; margin-bottom: 10px;">🎯 Desafios em Destaque</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Complete desafios e ganhe pontos para subir no ranking!</p>
+                </div>
+                
+                <div class="card">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), #f50057); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin-right: 15px;">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 18px;">Desafio dos 7 Dias</div>
+                            <div style="color: #666; font-size: 14px;">Complete tarefas diárias</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; background: #f8f9fa; padding: 12px; border-radius: 10px; margin: 15px 0;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: 900; color: var(--primary); font-size: 20px;">R$ 15</div>
+                            <div style="font-size: 12px; color: #666;">Inscrição</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-weight: 900; color: var(--accent); font-size: 20px;">R$ 1.500</div>
+                            <div style="font-size: 12px; color: #666;">Prêmio Total</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-weight: 900; color: var(--secondary); font-size: 20px;">0%</div>
+                            <div style="font-size: 12px; color: #666;">Concluído</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="participarDesafio()">
+                        <i class="fas fa-play-circle"></i> Participar Agora
+                    </button>
+                </div>
+                
+                <!-- Convide e Ganhe -->
+                <div class="card" style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 2px dashed var(--warning);">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="width: 60px; height: 60px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; margin: 0 auto 15px;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 style="color: #333; margin-bottom: 5px;">🎁 Convide e Ganhe!</h3>
+                        <p style="color: #666;">Ganhe <strong>R$ 5,00</strong> por cada amigo que depositar!</p>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: center;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">SEU CÓDIGO DE CONVITE</div>
+                        <div style="font-size: 22px; font-weight: 900; color: var(--primary); letter-spacing: 3px;" id="user-code">---</div>
+                        <button class="btn btn-secondary" onclick="copiarCodigo()" style="margin-top: 10px; padding: 10px;">
+                            <i class="fas fa-copy"></i> Copiar Código
+                        </button>
+                    </div>
+                    
+                    <div style="text-align: center; color: #666; font-size: 13px;">
+                        <i class="fas fa-info-circle"></i> Seus amigos ganham <strong>R$ 2,00 de bônus</strong> no primeiro depósito!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nav Menu -->
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="showPage('home')">
+                    <i class="fas fa-home nav-icon"></i>
+                    <div class="nav-label">Início</div>
+                </div>
+                <div class="nav-item" onclick="showPage('rifas')">
+                    <i class="fas fa-ticket-alt nav-icon"></i>
+                    <div class="nav-label">Rifas</div>
+                </div>
+                <div class="nav-item" onclick="showPage('ranking')">
+                    <i class="fas fa-trophy nav-icon"></i>
+                    <div class="nav-label">Ranking</div>
+                </div>
+                <div class="nav-item" onclick="showPage('perfil')">
+                    <i class="fas fa-user nav-icon"></i>
+                    <div class="nav-label">Perfil</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Admin Secreto -->
+        <div id="admin-modal" class="admin-modal">
+            <div class="admin-modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: var(--accent); font-size: 22px; font-weight: 700;">👑 Painel Admin</h3>
+                    <button onclick="closeAdminModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">ID do Usuário</label>
+                    <input type="text" id="admin-user-id" class="input-field" placeholder="ID do usuário">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Valor para Adicionar (R$)</label>
+                    <input type="number" id="admin-amount" class="input-field" placeholder="0.00" min="0" step="0.01">
+                </div>
+                
+                <button class="btn btn-accent" onclick="adminAddSaldo()">
+                    <i class="fas fa-plus-circle"></i> Adicionar Saldo
+                </button>
+                
+                <button class="btn" onclick="adminGetUsers()" style="margin-top: 10px;">
+                    <i class="fas fa-users"></i> Ver Todos Usuários
+                </button>
+                
+                <button class="btn btn-secondary" onclick="closeAdminModal()" style="margin-top: 10px;">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURAÇÃO FIREBASE ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsk295-CSkpOEk6fxkhdXmYaTXsYp6BiI",
+            authDomain: "rifaspay-cb30e.firebaseapp.com",
+            projectId: "rifaspay-cb30e",
+            storageBucket: "rifaspay-cb30e.firebasestorage.app",
+            messagingSenderId: "434795899894",
+            appId: "1:434795899894:web:9796fb75b9d28fe78fb5d7"
+        };
+        
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // ==================== VARIÁVEIS GLOBAIS ====================
+        let currentUser = null;
+        let currentUserData = null;
+        let tapCount = 0;
+        let lastTapTime = 0;
+        
+        // ==================== INICIALIZAÇÃO ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 RifasPay inicializando...");
+            
+            // Verificar se já está logado
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await loadUserData(user.uid);
+                    showMainContent();
+                } else {
+                    showLogin();
+                }
+            });
+            
+            // Configurar clique secreto para admin (7 toques no logo)
+            document.querySelector('.logo-circle').addEventListener('click', function() {
+                const now = Date.now();
+                if (now - lastTapTime < 1000) {
+                    tapCount++;
+                } else {
+                    tapCount = 1;
+                }
+                lastTapTime = now;
+                
+                if (tapCount >= 7) {
+                    showAdminSecret();
+                    tapCount = 0;
+                }
+            });
+        });
+        
+        // ==================== SISTEMA DE LOGIN ====================
+        function showLogin() {
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'none';
+        }
+        
+        function showRegister() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('register-screen').style.display = 'block';
+        }
+        
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showMessage('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                await loadUserData(currentUser.uid);
+                showMainContent();
+                showMessage('✅ Login realizado com sucesso!', 'success');
+            } catch (error) {
+                showMessage(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        async function register() {
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const referral = document.getElementById('register-referral').value;
+            
+            if (!name || !email || !password) {
+                showMessage('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('❌ Senha deve ter no mínimo 6 caracteres', 'error');
+                return;
+            }
+            
+            try {
+                // Criar usuário no Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Criar código de referência único
+                const referralCode = 'RP' + Math.random().toString(36).substr(2, 8).toUpperCase();
+                
+                // Salvar dados do usuário no Firestore
+                await db.collection('users').doc(currentUser.uid).set({
+                    uid: currentUser.uid,
+                    name: name,
+                    email: email,
+                    balance: 0,
+                    referralCode: referralCode,
+                    createdAt: new Date().toISOString(),
+                    totalDeposited: 0,
+                    totalWithdrawn: 0,
+                    referralFrom: referral || null,
+                    isAdmin: false
+                });
+                
+                // Se veio por indicação, dar bônus
+                if (referral) {
+                    const referrer = await db.collection('users').where('referralCode', '==', referral).get();
+                    if (!referrer.empty) {
+                        const referrerId = referrer.docs[0].id;
+                        await db.collection('users').doc(referrerId).update({
+                            balance: firebase.firestore.FieldValue.increment(5),
+                            referrals: firebase.firestore.FieldValue.increment(1)
+                        });
+                        
+                        // Registrar transação
+                        await db.collection('transactions').add({
+                            userId: referrerId,
+                            amount: 5,
+                            type: 'referral_bonus',
+                            description: `Bônus por indicação: ${name}`,
+                            date: new Date().toISOString()
+                        });
+                    }
+                }
+                
+                showMainContent();
+                showMessage('✅ Conta criada com sucesso!', 'success');
+                
+            } catch (error) {
+                showMessage(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        // ==================== SISTEMA DE USUÁRIOS ====================
+        async function loadUserData(uid) {
+            try {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    currentUserData = userDoc.data();
+                    updateUI();
+                    
+                    // Verificar se é admin
+                    if (currentUserData.isAdmin) {
+                        document.getElementById('user-name').innerHTML += ' <span style="background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;">ADMIN</span>';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+        
+        function updateUI() {
+            if (!currentUserData) return;
+            
+            // Atualizar informações do usuário
+            document.getElementById('user-name').textContent = currentUserData.name;
+            document.getElementById('user-id').textContent = currentUser.uid.substring(0, 8);
+            document.getElementById('user-balance').textContent = `R$ ${currentUserData.balance?.toFixed(2) || '0.00'}`;
+            document.getElementById('user-avatar').textContent = currentUserData.name.charAt(0).toUpperCase();
+            document.getElementById('user-code').textContent = currentUserData.referralCode || '---';
+        }
+        
+        // ==================== FUNCIONALIDADES PRINCIPAIS ====================
+        function showMainContent() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+        
+        function showPage(page) {
+            // Esconder todas as páginas
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Mostrar página selecionada
+            document.getElementById(page + '-page').classList.add('active');
+            
+            // Ativar item do menu
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, index) => {
+                if (item.onclick.toString().includes(page)) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        async function participarDesafio() {
+            if (!currentUserData || currentUserData.balance < 15) {
+                showMessage('❌ Saldo insuficiente! Deposite primeiro.', 'error');
+                return;
+            }
+            
+            try {
+                // Debita R$ 15
+                await db.collection('users').doc(currentUser.uid).update({
+                    balance: firebase.firestore.FieldValue.increment(-15)
+                });
+                
+                // Registra participação
+                await db.collection('participations').add({
+                    userId: currentUser.uid,
+                    challenge: '7_days',
+                    amount: 15,
+                    date: new Date().toISOString()
+                });
+                
+                showMessage('✅ Inscrição realizada! Boa sorte!', 'success');
+                await loadUserData(currentUser.uid);
+                
+            } catch (error) {
+                showMessage('❌ Erro ao participar', 'error');
+            }
+        }
+        
+        function copiarCodigo() {
+            const codigo = document.getElementById('user-code').textContent;
+            navigator.clipboard.writeText(codigo);
+            showMessage('✅ Código copiado! Envie para seus amigos.', 'success');
+        }
+        
+        function showDepositModal() {
+            alert('Funcionalidade de depósito PIX em desenvolvimento!\n\nSimulação: O saldo será adicionado via painel admin.');
+        }
+        
+        // ==================== SISTEMA ADMIN SECRETO ====================
+        function showAdminSecret() {
+            const codigo = prompt('🔐 Digite o código de acesso admin:');
+            if (codigo === 'ADMIN2024') {
+                showAdminModal();
+            } else {
+                alert('❌ Código inválido!');
+            }
+        }
+        
+        function showAdminModal() {
+            document.getElementById('admin-modal').style.display = 'flex';
+        }
+        
+        function closeAdminModal() {
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+        
+        async function adminAddSaldo() {
+            const userId = document.getElementById('admin-user-id').value;
+            const amount = parseFloat(document.getElementById('admin-amount').value);
+            
+            if (!userId || !amount || amount <= 0) {
+                showMessage('❌ Preencha todos os campos corretamente!', 'error');
+                return;
+            }
+            
+            try {
+                // Verificar se usuário existe
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (!userDoc.exists) {
+                    showMessage('❌ Usuário não encontrado!', 'error');
+                    return;
+                }
+                
+                // Adicionar saldo
+                await db.collection('users').doc(userId).update({
+                    balance: firebase.firestore.FieldValue.increment(amount)
+                });
+                
+                // Registrar transação
+                await db.collection('transactions').add({
+                    userId: userId,
+                    amount: amount,
+                    type: 'admin_add',
+                    description: 'Adição via painel admin',
+                    adminId: currentUser?.uid || 'system',
+                    date: new Date().toISOString()
+                });
+                
+                showMessage(`✅ R$ ${amount.toFixed(2)} adicionados ao usuário!`, 'success');
+                
+                // Se for o próprio usuário atual, atualizar UI
+                if (currentUser && userId === currentUser.uid) {
+                    await loadUserData(currentUser.uid);
+                }
+                
+            } catch (error) {
+                showMessage(`❌ Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        async function adminGetUsers() {
+            try {
+                const usersSnapshot = await db.collection('users').limit(20).get();
+                let usersList = '📊 USUÁRIOS DO SISTEMA:\n\n';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    usersList += `👤 ${user.name}\n`;
+                    usersList += `📧 ${user.email}\n`;
+                    usersList += `💰 Saldo: R$ ${user.balance?.toFixed(2) || '0.00'}\n`;
+                    usersList += `🔑 ID: ${doc.id.substring(0, 8)}...\n`;
+                    usersList += `📅 Criado: ${new Date(user.createdAt).toLocaleDateString()}\n`;
+                    usersList += `---\n\n`;
+                });
+                
+                alert(usersList);
+            } catch (error) {
+                showMessage('❌ Erro ao buscar usuários', 'error');
+            }
+        }
+        
+        // ==================== UTILITÁRIOS ====================
+        function showMessage(text, type) {
+            // Cria mensagem temporária
+            const msg = document.createElement('div');
+            msg.className = `status ${type}`;
+            msg.textContent = text;
+            msg.style.position = 'fixed';
+            msg.style.top = '20px';
+            msg.style.left = '50%';
+            msg.style.transform = 'translateX(-50%)';
+            msg.style.zIndex = '9999';
+            msg.style.maxWidth = '90%';
+            
+            document.body.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.remove();
+            }, 3000);
+        }
+        
+        // ==================== CONFIGURAÇÃO INICIAL ====================
+        console.log('✅ RifasPay pronto para uso!');
+        console.log('👑 Sistema Admin: Toque 7x no logo');
+        console.log('🔑 Código Admin: ADMIN2024');
+        console.log('🔥 Firebase conectado');
+    </script>
+</body>
+</html>
