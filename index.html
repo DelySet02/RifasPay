@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifasPay - MiniApp Completo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c853, #64dd17);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-right: 12px;
+        }
+        
+        .profile-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .balance-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .deposit-btn {
+            background: #00c853;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .deposit-btn:hover {
+            background: #00e676;
+            transform: translateY(-2px);
+        }
+        
+        /* Menu de Navegação */
+        .nav-menu {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+            padding: 10px 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-item.active {
+            color: #1a237e;
+            background: rgba(26, 35, 126, 0.1);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        /* Conteúdo das páginas */
+        .page {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.4s;
+            padding-bottom: 30px;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title i {
+            margin-right: 10px;
+            background: #1a237e;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: #00c853;
+        }
+        
+        .card-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .btn {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background: #311b92;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        /* Ranking Styles */
+        .ranking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .ranking-selector {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .ranking-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .ranking-tab i {
+            margin-right: 8px;
+        }
+        
+        .ranking-tab.active {
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            color: #1a237e;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #fafafa;
+        }
+        
+        .ranking-item:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+        
+        .ranking-item.top3 {
+            background: linear-gradient(135deg, #fff8e1, #fff3e0);
+            border-left: 4px solid #ff9800;
+        }
+        
+        .ranking-item.top3:nth-child(1) {
+            background: linear-gradient(135deg, #fffde7, #fff8e1);
+            border-left: 4px solid #ffd700;
+        }
+        
+        .ranking-item.top3:nth-child(2) {
+            background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+            border-left: 4px solid #c0c0c0;
+        }
+        
+        .ranking-item.top3:nth-child(3) {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-left: 4px solid #cd7f32;
+        }
+        
+        .rank-position {
+            font-size: 24px;
+            font-weight: 700;
+            width: 50px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .ranking-item.top3 .rank-position {
+            font-size: 28px;
+            color: #1a237e;
+        }
+        
+        .ranking-item:nth-child(1) .rank-position {
+            color: #ffd700;
+        }
+        
+        .ranking-item:nth-child(2) .rank-position {
+            color: #c0c0c0;
+        }
+        
+        .ranking-item:nth-child(3) .rank-position {
+            color: #cd7f32;
+        }
+        
+        .rank-user {
+            flex: 1;
+            margin-left: 10px;
+        }
+        
+        .rank-user-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+        
+        .rank-user-stats {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .rank-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00c853;
+        }
+        
+        .your-position-card {
+            background: linear-gradient(135deg, #1a237e, #311b92);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .your-position-title {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .your-position-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .refresh-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1a237e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
+        
+        /* Timer */
+        .timer-badge {
+            background: linear-gradient(135deg, #ff4081, #f50057);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        /* Admin Button */
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4081;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Status */
+        .status {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <button class="admin-btn" onclick="showAdminModal()" id="adminButton">A</button>
+    
+    <div class="app-container">
+        <!-- Cabeçalho com saldo -->
+        <div class="header">
+            <div class="user-info">
+                <div class="profile">
+                    <div class="profile-img">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div class="profile-name" id="user-name">@usuario</div>
+                        <div style="font-size: 14px; opacity: 0.8;" id="user-id">ID: ---</div>
+                    </div>
+                </div>
+                <div>
+                    <i class="fas fa-bell" style="font-size: 22px; opacity: 0.8; cursor: pointer;" onclick="showNotifications()"></i>
+                </div>
+            </div>
+            
+            <div class="balance-card">
+                <div class="balance-label">SALDO DISPONÍVEL</div>
+                <div class="balance-amount" id="user-balance">R$ 0,00</div>
+                <button class="deposit-btn" onclick="showDepositModal()">
+                    <i class="fas fa-plus-circle"></i> Depositar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Página de Gincanas -->
+        <div id="gincanas-page" class="page active">
+            <div class="page-title">
+                <i class="fas fa-trophy"></i> Gincanas
+                <span class="timer-badge" id="gincana-timer">24:00:00</span>
+            </div>
+            
+            <div id="gincanas-list">
+                <!-- Gincanas carregadas dinamicamente -->
+            </div>
+            
+            <button class="btn btn-secondary" onclick="showAdminModal()">
+                <i class="fas fa-plus"></i> Criar Nova Gincana (Admin)
+            </button>
+        </div>
+        
+        <!-- Página de Ganhar Dinheiro -->
+        <div id="ganhar-page" class="page">
+            <div class="page-title">
+                <i class="fas fa-money-bill-wave"></i> Ganhar Dinheiro
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-coins"></i> Missões Disponíveis
+                </div>
+                <div class="card-description">
+                    Complete tarefas simples e ganhe saldo para usar nas rifas e gincanas!
+                </div>
+                
+                <div class="mission-item" style="display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
+                    <div class="mission-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #ff9800, #ff5722); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-right: 15px;">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 5px;">Assista este vídeo</div>
+                        <div style="font-size: 14px; color: #666;">Assista o vídeo completo (30 segundos)</div>
+                    </div>
+                    <div class="mission-reward" onclick="completarMissao(0.50)" style="background: #4caf50; color: white; padding: 5px 12px; border-radius: 20px; font-weight: 600; cursor: pointer;">R$ 0,50</div>
+                </div>
+                
+                <div class="mission-item" style="display: flex; align-items: center; padding: 15px 0;">
+                    <div class="mission-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #2196f3, #0d47a1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-right: 15px;">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 5px;">Instale e use este app</div>
+                        <div style="font-size: 14px; color: #666;">Use por 5 minutos e ganhe</div>
+                    </div>
+                    <div class="mission-reward" onclick="completarMissao(2.50)" style="background: #4caf50; color: white; padding: 5px 12px; border-radius: 20px; font-weight: 600; cursor: pointer;">R$ 2,50</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Rifas -->
+        <div id="rifas-page" class="page">
+            <div class="page-title">
+                <i class="fas fa-ticket-alt"></i> Rifas
+                <span class="timer-badge" id="rifas-timer">24:00:00</span>
+            </div>
+            
+            <div class="rifa-type-selector" style="display: flex; margin-bottom: 20px; background: #f5f5f5; border-radius: 10px; padding: 5px;">
+                <div class="rifa-type active" onclick="changeRifaType('tradicional')" style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; background: white; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                    Tradicionais
+                </div>
+                <div class="rifa-type" onclick="changeRifaType('rapidinha')" style="flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Rapidinha
+                </div>
+            </div>
+            
+            <!-- Rifas Tradicionais -->
+            <div id="rifas-tradicionais">
+                <div id="rifas-tradicionais-list">
+                    <!-- Rifas carregadas dinamicamente -->
+                </div>
+                
+                <button class="btn btn-secondary" onclick="showAdminModal()">
+                    <i class="fas fa-plus"></i> Criar Nova Rifa (Admin)
+                </button>
+            </div>
+            
+            <!-- Rapidinha -->
+            <div id="rifas-rapidinha" style="display: none;">
+                <div class="rapidinha-timer" style="background: linear-gradient(135deg, #ff4081, #f50057); color: white; text-align: center; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                    <div class="timer-label">PRÓXIMO SORTEIO EM</div>
+                    <div class="timer-value" id="rapidinha-timer">05:00</div>
+                    <div class="timer-label">POTE ATUAL: <span id="rapidinha-pote">R$ 0,00</span></div>
+                </div>
+                
+                <div id="rapidinhas-list">
+                    <!-- Rapidinhas carregadas dinamicamente -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Página de Ranking -->
+        <div id="ranking-page" class="page">
+            <div class="page-title">
+                <i class="fas fa-trophy"></i> Rankings
+                <span class="timer-badge" id="ranking-timer">24:00:00</span>
+            </div>
+            
+            <div class="ranking-selector" style="display: flex; background: #f5f5f5; border-radius: 10px; padding: 5px; margin-bottom: 20px;">
+                <div class="ranking-tab active" onclick="changeRankingType('depositos')" style="flex: 1; text-align: center; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: 600; background: white; box-shadow: 0 3px 10px rgba(0,0,0,0.1); color: #1a237e; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-money-bill-wave"></i> Top Depósitos
+                </div>
+                <div class="ranking-tab" onclick="changeRankingType('pontos')" style="flex: 1; text-align: center; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-star"></i> Top Pontos
+                </div>
+                <div class="ranking-tab" onclick="changeRankingType('gincanas')" style="flex: 1; text-align: center; padding: 12px 5px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-crown"></i> Top Gincanas
+                </div>
+            </div>
+            
+            <!-- Ranking de Depósitos -->
+            <div id="ranking-depositos">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-medal"></i> Top 10 Maiores Depósitos
+                        <small style="margin-left: 10px; font-size: 12px; color: #666;">(Últimas 24h)</small>
+                    </div>
+                    <div id="ranking-depositos-list">
+                        <!-- Ranking carregado automaticamente -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ranking de Pontos -->
+            <div id="ranking-pontos" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-crown"></i> Top 10 Maiores Pontuações
+                        <small style="margin-left: 10px; font-size: 12px; color: #666;">(Últimas 24h)</small>
+                    </div>
+                    <div id="ranking-pontos-list">
+                        <!-- Ranking carregado automaticamente -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ranking de Gincanas -->
+            <div id="ranking-gincanas" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-trophy"></i> Top 10 Gincanas
+                        <small style="margin-left: 10px; font-size: 12px; color: #666;">(Últimas 24h)</small>
+                    </div>
+                    <div id="ranking-gincanas-list">
+                        <!-- Ranking carregado automaticamente -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sua Posição -->
+            <div class="your-position-card">
+                <div class="your-position-title" id="position-title">SUA POSIÇÃO NO RANKING</div>
+                <div class="your-position-value" id="user-position">#--</div>
+                <div style="font-size: 18px; opacity: 0.9;" id="user-position-value">Carregando...</div>
+                <button class="refresh-btn" onclick="atualizarRankings()">
+                    <i class="fas fa-sync-alt"></i> Atualizar Ranking
+                </button>
+            </div>
+        </div>
+        
+        <!-- Página de Perfil -->
+        <div id="perfil-page" class="page">
+            <div class="page-title">
+                <i class="fas fa-user-circle"></i> Meu Perfil
+            </div>
+            
+            <div style="text-align: center;">
+                <div class="profile-avatar" id="profile-avatar-large" style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a237e, #311b92); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div style="margin-bottom: 30px;">
+                    <div style="font-size: 24px; font-weight: 700;" id="profile-username">@usuariotelegram</div>
+                    <div style="color: #666; margin-top: 5px;" id="profile-join-date">Membro desde 2022</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i> Estatísticas
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="profile-balance">R$ 0,00</div>
+                            <div class="stat-label">Saldo</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="profile-rifas">0</div>
+                            <div class="stat-label">Rifas</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="profile-ranking">#--</div>
+                            <div class="stat-label">Melhor Ranking</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn" style="margin-top: 20px; background: linear-gradient(135deg, #ff4081, #f50057);" onclick="showPage('ranking-page')">
+                    <i class="fas fa-trophy"></i> Ver Meu Ranking
+                </button>
+                
+                <button class="btn btn-secondary" style="margin-top: 10px;" onclick="showAdminModal()">
+                    <i class="fas fa-user-shield"></i> Acesso Admin
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menu de navegação -->
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="showPage('gincanas-page')">
+                <div class="nav-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="nav-label">Gincanas</div>
+            </div>
+            <div class="nav-item" onclick="showPage('ganhar-page')">
+                <div class="nav-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="nav-label">Ganhar</div>
+            </div>
+            <div class="nav-item" onclick="showPage('rifas-page')">
+                <div class="nav-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="nav-label">Rifas</div>
+            </div>
+            <div class="nav-item" onclick="showPage('ranking-page')">
+                <div class="nav-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="nav-label">Ranking</div>
+            </div>
+            <div class="nav-item" onclick="showPage('perfil-page')">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="nav-label">Perfil</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Admin -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👑 Painel Administrativo</div>
+            <button class="close-modal" onclick="closeModal('admin-modal')">×</button>
+            
+            <div id="admin-status" class="status" style="display: none;"></div>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title">
+                    <i class="fas fa-user-plus"></i> Adicionar Saldo
+                </div>
+                <input type="text" id="admin-user-id" placeholder="ID do Usuário" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <input type="number" id="admin-amount" placeholder="Valor (R$)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <button class="btn btn-success" onclick="adminAddSaldo()">
+                    <i class="fas fa-plus"></i> Adicionar Saldo
+                </button>
+            </div>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title">
+                    <i class="fas fa-trophy"></i> Criar Gincana
+                </div>
+                <input type="text" id="gincana-nome" placeholder="Nome da Gincana" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <input type="number" id="gincana-preco" placeholder="Preço de Inscrição (R$)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <input type="number" id="gincana-premio" placeholder="Prêmio Total (R$)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <button class="btn" onclick="adminCriarGincana()">
+                    <i class="fas fa-plus"></i> Criar Gincana
+                </button>
+            </div>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-title">
+                    <i class="fas fa-ticket-alt"></i> Criar Rifa
+                </div>
+                <input type="text" id="rifa-nome" placeholder="Nome da Rifa" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <input type="number" id="rifa-preco" placeholder="Preço por Número (R$)" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <input type="text" id="rifa-premio" placeholder="Descrição do Prêmio" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <select id="rifa-tipo" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <option value="tradicional">Rifa Tradicional</option>
+                    <option value="rapidinha">Rapidinha</option>
+                </select>
+                <button class="btn" onclick="adminCriarRifa()">
+                    <i class="fas fa-plus"></i> Criar Rifa
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-cogs"></i> Controles do Sistema
+                </div>
+                <button class="btn" onclick="adminResetarRankings()" style="background: #ff9800; margin-bottom: 10px;">
+                    <i class="fas fa-sync-alt"></i> Resetar Rankings
+                </button>
+                <button class="btn" onclick="adminVerEstatisticas()" style="background: #9c27b0; margin-bottom: 10px;">
+                    <i class="fas fa-chart-bar"></i> Ver Estatísticas
+                </button>
+                <button class="btn" onclick="adminGerarUsuariosFake()" style="background: #00bcd4;">
+                    <i class="fas fa-users"></i> Gerar Usuários Fake
+                </button>
+            </div>
+            
+            <button class="btn btn-secondary" style="margin-top: 20px;" onclick="closeModal('admin-modal')">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== CONFIGURAÇÕES GLOBAIS ====================
+        const ADMIN_PASSWORD = "ADMIN2024";
+        
+        // Dados fictícios realistas
+        const nomesBrasileiros = [
+            "João Silva", "Maria Santos", "Pedro Oliveira", "Ana Costa", "Lucas Pereira",
+            "Julia Rodrigues", "Carlos Souza", "Fernanda Lima", "Rafael Almeida", "Amanda Ferreira",
+            "Bruno Ribeiro", "Patrícia Cardoso", "Rodrigo Martins", "Isabela Gomes", "Marcos Lopes",
+            "Camila Castro", "Daniel Dias", "Larissa Rocha", "Felipe Nunes", "Vanessa Moreira"
+        ];
+        
+        const sobrenomes = [
+            "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Almeida", "Pereira",
+            "Lima", "Costa", "Gomes", "Martins", "Araújo", "Ribeiro", "Carvalho", "Melo", "Cardoso",
+            "Teixeira", "Cunha", "Machado"
+        ];
+        
+        // ==================== DADOS DO SISTEMA ====================
+        let usuario = {
+            id: Math.floor(Math.random() * 1000000),
+            nome: "Usuário Demo",
+            username: "@usuario",
+            saldo: 47.50,
+            pontos: 7850,
+            totalDepositado: 350.00,
+            rankingDepositos: 15,
+            rankingPontos: 8,
+            rankingGincanas: 12,
+            joinDate: "2022-10-15"
+        };
+        
+        let gincanas = [];
+        let rifas = [];
+        let rapidinhas = [];
+        let rankingDepositos = [];
+        let rankingPontos = [];
+        let rankingGincanas = [];
+        
+        // ==================== INICIALIZAÇÃO ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 RifasPay iniciando...");
+            
+            // Inicializar dados fictícios
+            inicializarDadosFicticios();
+            
+            // Configurar usuário
+            configurarUsuario();
+            
+            // Carregar dados iniciais
+            carregarGincanas();
+            carregarRifas();
+            carregarRankings();
+            
+            // Iniciar timers
+            iniciarTimers();
+            
+            // Configurar botão admin secreto
+            configurarAdminSecreto();
+            
+            console.log("✅ Sistema carregado com sucesso!");
+        });
+        
+        // ==================== INICIALIZAÇÃO DE DADOS ====================
+        function inicializarDadosFicticios() {
+            // Gerar gincanas fictícias
+            gincanas = [
+                {
+                    id: 1,
+                    nome: "🏆 Desafio dos 7 Dias",
+                    descricao: "Complete desafios diários e suba no ranking!",
+                    preco: 15,
+                    premio: 1500,
+                    participantes: 127,
+                    status: "ativa",
+                    tempoRestante: 86400 // 24h em segundos
+                },
+                {
+                    id: 2,
+                    nome: "⚡ Gincana Relâmpago",
+                    descricao: "Apenas 24h para acumular pontos!",
+                    preco: 10,
+                    premio: 800,
+                    participantes: 89,
+                    status: "ativa",
+                    tempoRestante: 43200 // 12h
+                }
+            ];
+            
+            // Gerar rifas fictícias
+            rifas = [
+                {
+                    id: 1,
+                    nome: "🎮 PlayStation 5",
+                    descricao: "1x PS5 Digital Edition nova na caixa",
+                    preco: 10,
+                    premio: "PlayStation 5",
+                    vendidos: 47,
+                    total: 100,
+                    status: "ativa",
+                    diasRestantes: 5
+                },
+                {
+                    id: 2,
+                    nome: "📱 iPhone 15 Pro",
+                    descricao: "iPhone 15 Pro 256GB, cor Titânio Natural",
+                    preco: 15,
+                    premio: "iPhone 15 Pro",
+                    vendidos: 65,
+                    total: 100,
+                    status: "ativa",
+                    diasRestantes: 18
+                }
+            ];
+            
+            // Gerar rapidinhas fictícias
+            rapidinhas = [
+                {
+                    id: 1,
+                    nome: "⚡ Rapidinha R$ 500",
+                    descricao: "Sorteio a cada 5 minutos!",
+                    preco: 2,
+                    premio: 500,
+                    poteAtual: 450,
+                    bilhetesVendidos: 225,
+                    status: "ativa",
+                    tempoRestante: 300 // 5 minutos
+                }
+            ];
+            
+            // Gerar rankings fictícios
+            gerarRankingsFicticios();
+        }
+        
+        function gerarRankingsFicticios() {
+            // Ranking de Depósitos
+            rankingDepositos = [];
+            for (let i = 0; i < 10; i++) {
+                const nome = nomesBrasileiros[i];
+                const username = `@${nome.toLowerCase().replace(/ /g, '')}${Math.floor(Math.random() * 100)}`;
+                const valor = 1000 + Math.random() * 2000;
+                
+                rankingDepositos.push({
+                    posicao: i + 1,
+                    username: username,
+                    nome: nome,
+                    valor: valor,
+                    online: Math.random() > 0.3,
+                    variacao: i === 0 ? "🏆 Líder" : i < 3 ? "🔥 Subindo" : "📈 Estável"
+                });
+            }
+            
+            // Ranking de Pontos
+            rankingPontos = [];
+            for (let i = 0; i < 10; i++) {
+                const nome = nomesBrasileiros[10 + i];
+                const username = `@${nome.toLowerCase().replace(/ /g, '')}${Math.floor(Math.random() * 100)}`;
+                const pontos = 5000 + Math.random() * 10000;
+                
+                rankingPontos.push({
+                    posicao: i + 1,
+                    username: username,
+                    nome: nome,
+                    pontos: pontos,
+                    online: Math.random() > 0.4,
+                    nivel: i === 0 ? "🏅 Mestre" : i < 3 ? "🥈 Expert" : "🥉 Avançado"
+                });
+            }
+            
+            // Ranking de Gincanas
+            rankingGincanas = [];
+            for (let i = 0; i < 10; i++) {
+                const nome = nomesBrasileiros[5 + i];
+                const username = `@${nome.toLowerCase().replace(/ /g, '')}${Math.floor(Math.random() * 100)}`;
+                const vitorias = 3 + Math.floor(Math.random() * 10);
+                const premiacao = 500 + Math.random() * 3000;
+                
+                rankingGincanas.push({
+                    posicao: i + 1,
+                    username: username,
+                    nome: nome,
+                    vitorias: vitorias,
+                    premiacao: premiacao,
+                    online: Math.random() > 0.5,
+                    streak: i === 0 ? "🔥 7 vitórias seguidas" : i < 3 ? "⭐ 3 vitórias" : "📈 Ativo"
+                });
+            }
+        }
+        
+        // ==================== SISTEMA DE USUÁRIO ====================
+        function configurarUsuario() {
+            document.getElementById('user-name').textContent = usuario.username;
+            document.getElementById('user-id').textContent = `ID: ${usuario.id}`;
+            document.getElementById('user-balance').textContent = `R$ ${usuario.saldo.toFixed(2)}`;
+            document.getElementById('profile-username').textContent = usuario.username;
+            document.getElementById('profile-balance').textContent = `R$ ${usuario.saldo.toFixed(2)}`;
+            document.getElementById('profile-ranking').textContent = `#${Math.min(usuario.rankingDepositos, usuario.rankingPontos, usuario.rankingGincanas)}`;
+            
+            const joinDate = new Date(usuario.joinDate);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('profile-join-date').textContent = `Membro desde ${joinDate.toLocaleDateString('pt-BR', options)}`;
+        }
+        
+        // ==================== SISTEMA DE GINCANAS ====================
+        function carregarGincanas() {
+            const container = document.getElementById('gincanas-list');
+            container.innerHTML = '';
+            
+            gincanas.forEach(gincana => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title">
+                        <i class="fas fa-crown"></i> ${gincana.nome}
+                    </div>
+                    <div class="card-description">
+                        ${gincana.descricao}
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <div class="stat-value">R$ ${gincana.preco.toFixed(2)}</div>
+                            <div class="stat-label">Inscrição</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">R$ ${gincana.premio.toFixed(2)}</div>
+                            <div class="stat-label">Prêmio</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${gincana.participantes}</div>
+                            <div class="stat-label">Participantes</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="participarGincana(${gincana.id})">
+                        <i class="fas fa-play-circle"></i> Participar (R$ ${gincana.preco.toFixed(2)})
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function participarGincana(gincanaId) {
+            const gincana = gincanas.find(g => g.id === gincanaId);
+            if (!gincana) return;
+            
+            if (usuario.saldo >= gincana.preco) {
+                usuario.saldo -= gincana.preco;
+                usuario.pontos += 200;
+                usuario.rankingGincanas = Math.max(1, usuario.rankingGincanas - 2);
+                
+                gincana.participantes++;
+                
+                configurarUsuario();
+                mostrarStatus(`✅ Inscrição em "${gincana.nome}" realizada!`, 'success');
+                
+                // Atualizar ranking
+                setTimeout(() => carregarRankings(), 1000);
+            } else {
+                mostrarStatus('❌ Saldo insuficiente!', 'error');
+            }
+        }
+        
+        // ==================== SISTEMA DE RIFAS ====================
+        function carregarRifas() {
+            // Rifas Tradicionais
+            const tradContainer = document.getElementById('rifas-tradicionais-list');
+            tradContainer.innerHTML = '';
+            
+            rifas.forEach(rifa => {
+                const percentual = (rifa.vendidos / rifa.total) * 100;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title">
+                        <i class="fas fa-gamepad"></i> ${rifa.nome}
+                    </div>
+                    <div class="card-description">
+                        ${rifa.descricao}
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <div class="stat-value">R$ ${rifa.preco.toFixed(2)}</div>
+                            <div class="stat-label">Por número</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${percentual.toFixed(0)}%</div>
+                            <div class="stat-label">Vendidos</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${rifa.diasRestantes} dias</div>
+                            <div class="stat-label">Restantes</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="comprarRifa(${rifa.id})">
+                        <i class="fas fa-shopping-cart"></i> Comprar Número (R$ ${rifa.preco.toFixed(2)})
+                    </button>
+                `;
+                tradContainer.appendChild(card);
+            });
+            
+            // Rapidinhas
+            const rapContainer = document.getElementById('rapidinhas-list');
+            rapContainer.innerHTML = '';
+            
+            rapidinhas.forEach(rapidinha => {
+                const premio = rapidinha.poteAtual * 0.7;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title">
+                        <i class="fas fa-bolt"></i> ${rapidinha.nome}
+                    </div>
+                    <div class="card-description">
+                        ${rapidinha.descricao}
+                    </div>
+                    <div class="card-stats">
+                        <div class="stat">
+                            <div class="stat-value">R$ ${rapidinha.preco.toFixed(2)}</div>
+                            <div class="stat-label">Por bilhete</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${rapidinha.bilhetesVendidos}</div>
+                            <div class="stat-label">Bilhetes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">R$ ${premio.toFixed(2)}</div>
+                            <div class="stat-label">Prêmio</div>
+                        </div>
+                    </div>
+                    <button class="btn" style="background: linear-gradient(135deg, #ff4081, #f50057);" onclick="comprarRapidinha(${rapidinha.id})">
+                        <i class="fas fa-bolt"></i> Comprar Bilhete (R$ ${rapidinha.preco.toFixed(2)})
+                    </button>
+                `;
+                rapContainer.appendChild(card);
+            });
+            
+            // Atualizar pote da rapidinha
+            if (rapidinhas.length > 0) {
+                document.getElementById('rapidinha-pote').textContent = `R$ ${rapidinhas[0].poteAtual.toFixed(2)}`;
+            }
+        }
+        
+        function comprarRifa(rifaId) {
+            const rifa = rifas.find(r => r.id === rifaId);
+            if (!rifa) return;
+            
+            if (usuario.saldo >= rifa.preco) {
+                usuario.saldo -= rifa.preco;
+                usuario.pontos += Math.floor(rifa.preco * 5);
+                
+                rifa.vendidos = Math.min(rifa.vendidos + 1, rifa.total);
+                
+                configurarUsuario();
+                mostrarStatus(`✅ Número comprado em "${rifa.nome}"!`, 'success');
+                
+                // Atualizar exibição
+                setTimeout(() => carregarRifas(), 1000);
+            } else {
+                mostrarStatus('❌ Saldo insuficiente!', 'error');
+            }
+        }
+        
+        function comprarRapidinha(rapidinhaId) {
+            const rapidinha = rapidinhas.find(r => r.id === rapidinhaId);
+            if (!rapidinha) return;
+            
+            if (usuario.saldo >= rapidinha.preco) {
+                usuario.saldo -= rapidinha.preco;
+                usuario.pontos += 20;
+                
+                rapidinha.bilhetesVendidos++;
+                rapidinha.poteAtual += rapidinha.preco;
+                
+                configurarUsuario();
+                carregarRifas();
+                mostrarStatus(`✅ Bilhete comprado na rapidinha! Boa sorte!`, 'success');
+            } else {
+                mostrarStatus('❌ Saldo insuficiente!', 'error');
+            }
+        }
+        
+        function changeRifaType(type) {
+            const tradicional = document.getElementById('rifas-tradicionais');
+            const rapidinha = document.getElementById('rifas-rapidinha');
+            const tradicionalBtn = document.querySelectorAll('.rifa-type')[0];
+            const rapidinhaBtn = document.querySelectorAll('.rifa-type')[1];
+            
+            if (type === 'tradicional') {
+                tradicional.style.display = 'block';
+                rapidinha.style.display = 'none';
+                tradicionalBtn.classList.add('active');
+                rapidinhaBtn.classList.remove('active');
+            } else {
+                tradicional.style.display = 'none';
+                rapidinha.style.display = 'block';
+                tradicionalBtn.classList.remove('active');
+                rapidinhaBtn.classList.add('active');
+            }
+        }
+        
+        // ==================== SISTEMA DE RANKING ====================
+        function carregarRankings() {
+            carregarRankingDepositos();
+            carregarRankingPontos();
+            carregarRankingGincanas();
+            
+            // Atualizar posição do usuário
+            updateUserPosition();
+        }
+        
+        function carregarRankingDepositos() {
+            const container = document.getElementById('ranking-depositos-list');
+            container.innerHTML = '';
+            
+            rankingDepositos.forEach(user => {
+                const isTop3 = user.posicao <= 3;
+                const isCurrentUser = user.username === usuario.username;
+                
+                const item = document.createElement('div');
+                item.className = `ranking-item ${isTop3 ? 'top3' : ''} ${isCurrentUser ? 'current-user' : ''}`;
+                item.innerHTML = `
+                    <div class="rank-position">${user.posicao}</div>
+                    <div class="rank-user">
+                        <div class="rank-user-name">
+                            ${user.username} ${user.online ? '<span style="color: #00c853; font-size: 12px;">● Online</span>' : ''}
+                            ${isCurrentUser ? '<span style="color: #ff4081;">(Você)</span>' : ''}
+                        </div>
+                        <div class="rank-user-stats">${user.variacao} • ${user.nome}</div>
+                    </div>
+                    <div class="rank-value">R$ ${user.valor.toFixed(2)}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function carregarRankingPontos() {
+            const container = document.getElementById('ranking-pontos-list');
+            container.innerHTML = '';
+            
+            rankingPontos.forEach(user => {
+                const isTop3 = user.posicao <= 3;
+                const isCurrentUser = user.username === usuario.username;
+                
+                const item = document.createElement('div');
+                item.className = `ranking-item ${isTop3 ? 'top3' : ''} ${isCurrentUser ? 'current-user' : ''}`;
+                item.innerHTML = `
+                    <div class="rank-position">${user.posicao}</div>
+                    <div class="rank-user">
+                        <div class="rank-user-name">
+                            ${user.username} ${user.online ? '<span style="color: #00c853; font-size: 12px;">● Online</span>' : ''}
+                            ${isCurrentUser ? '<span style="color: #ff4081;">(Você)</span>' : ''}
+                        </div>
+                        <div class="rank-user-stats">${user.nivel} • ${user.nome}</div>
+                    </div>
+                    <div class="rank-value">${user.pontos.toLocaleString()} pts</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function carregarRankingGincanas() {
+            const container = document.getElementById('ranking-gincanas-list');
+            container.innerHTML = '';
+            
+            rankingGincanas.forEach(user => {
+                const isTop3 = user.posicao <= 3;
+                const isCurrentUser = user.username === usuario.username;
+                
+                const item = document.createElement('div');
+                item.className = `ranking-item ${isTop3 ? 'top3' : ''} ${isCurrentUser ? 'current-user' : ''}`;
+                item.innerHTML = `
+                    <div class="rank-position">${user.posicao}</div>
+                    <div class="rank-user">
+                        <div class="rank-user-name">
+                            ${user.username} ${user.online ? '<span style="color: #00c853; font-size: 12px;">● Online</span>' : ''}
+                            ${isCurrentUser ? '<span style="color: #ff4081;">(Você)</span>' : ''}
+                        </div>
+                        <div class="rank-user-stats">${user.streak} • ${user.nome}</div>
+                    </div>
+                    <div class="rank-value">${user.vitorias} 🏆</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function updateUserPosition() {
+            document.getElementById('user-position').textContent = `#${usuario.rankingDepositos}`;
+            document.getElementById('user-position-value').textContent = `R$ ${usuario.totalDepositado.toFixed(2)} depositados`;
+            document.getElementById('position-title').textContent = 'SUA POSIÇÃO NO RANKING DE DEPÓSITOS';
+        }
+        
+        function changeRankingType(type) {
+            const tabs = document.querySelectorAll('.ranking-tab');
+            const depositosDiv = document.getElementById('ranking-depositos');
+            const pontosDiv = document.getElementById('ranking-pontos');
+            const gincanasDiv = document.getElementById('ranking-gincanas');
+            
+            // Remover active de todas as tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Esconder todas as divs
+            depositosDiv.style.display = 'none';
+            pontosDiv.style.display = 'none';
+            gincanasDiv.style.display = 'none';
+            
+            // Ativar tab e mostrar div correspondente
+            if (type === 'depositos') {
+                tabs[0].classList.add('active');
+                depositosDiv.style.display = 'block';
+                document.getElementById('user-position').textContent = `#${usuario.rankingDepositos}`;
+                document.getElementById('user-position-value').textContent = `R$ ${usuario.totalDepositado.toFixed(2)} depositados`;
+                document.getElementById('position-title').textContent = 'SUA POSIÇÃO NO RANKING DE DEPÓSITOS';
+            } else if (type === 'pontos') {
+                tabs[1].classList.add('active');
+                pontosDiv.style.display = 'block';
+                document.getElementById('user-position').textContent = `#${usuario.rankingPontos}`;
+                document.getElementById('user-position-value').textContent = `${usuario.pontos.toLocaleString()} pontos`;
+                document.getElementById('position-title').textContent = 'SUA POSIÇÃO NO RANKING DE PONTOS';
+            } else {
+                tabs[2].classList.add('active');
+                gincanasDiv.style.display = 'block';
+                document.getElementById('user-position').textContent = `#${usuario.rankingGincanas}`;
+                document.getElementById('user-position-value').textContent = `${usuario.pontos.toLocaleString()} pontos`;
+                document.getElementById('position-title').textContent = 'SUA POSIÇÃO NO RANKING DE GINCANAS';
+            }
+        }
+        
+        function atualizarRankings() {
+            // Simular atualização dos dados
+            gerarRankingsFicticios();
+            
+            // Atualizar posição do usuário (melhorar aleatoriamente)
+            if (Math.random() > 0.5) {
+                usuario.rankingDepositos = Math.max(1, usuario.rankingDepositos - Math.floor(Math.random() * 3));
+                usuario.rankingPontos = Math.max(1, usuario.rankingPontos - Math.floor(Math.random() * 2));
+                usuario.rankingGincanas = Math.max(1, usuario.rankingGincanas - Math.floor(Math.random() * 2));
+            }
+            
+            carregarRankings();
+            mostrarStatus('✅ Rankings atualizados com sucesso!', 'success');
+        }
+        
+        // ==================== SISTEMA DE MISSÕES ====================
+        function completarMissao(valor) {
+            usuario.saldo += valor;
+            usuario.pontos += Math.floor(valor * 10);
+            
+            configurarUsuario();
+            mostrarStatus(`✅ Missão completa! +R$ ${valor.toFixed(2)}`, 'success');
+        }
+        
+        function showDepositModal() {
+            const valor = parseFloat(prompt("Digite o valor do depósito (ex: 50.00):"));
+            if (valor && valor > 0) {
+                usuario.saldo += valor;
+                usuario.totalDepositado += valor;
+                usuario.pontos += Math.floor(valor * 2);
+                usuario.rankingDepositos = Math.max(1, usuario.rankingDepositos - Math.floor(valor / 50));
+                
+                configurarUsuario();
+                carregarRankings();
+                mostrarStatus(`✅ Depósito de R$ ${valor.toFixed(2)} realizado!`, 'success');
+            }
+        }
+        
+        // ==================== SISTEMA ADMIN ====================
+        function configurarAdminSecreto() {
+            let tapCount = 0;
+            let lastTap = 0;
+            
+            document.querySelector('.logo').addEventListener('click', function(e) {
+                const now = Date.now();
+                if (now - lastTap < 500) {
+                    tapCount++;
+                } else {
+                    tapCount = 1;
+                }
+                lastTap = now;
+                
+                if (tapCount >= 7) {
+                    const code = prompt('🔐 Código Admin:');
+                    if (code === ADMIN_PASSWORD) {
+                        document.getElementById('adminButton').style.display = 'block';
+                        mostrarStatus('👑 Modo admin ativado!', 'success');
+                    }
+                    tapCount = 0;
+                }
+            });
+        }
+        
+        function showAdminModal() {
+            document.getElementById('admin-modal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function adminAddSaldo() {
+            const userId = document.getElementById('admin-user-id').value;
+            const amount = parseFloat(document.getElementById('admin-amount').value);
+            
+            if (!userId || !amount || amount <= 0) {
+                mostrarAdminStatus('❌ Preencha todos os campos corretamente!', 'error');
+                return;
+            }
+            
+            // Simular adição de saldo
+            usuario.saldo += amount;
+            usuario.totalDepositado += amount;
+            
+            configurarUsuario();
+            mostrarAdminStatus(`✅ R$ ${amount.toFixed(2)} adicionados ao usuário!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('admin-user-id').value = '';
+            document.getElementById('admin-amount').value = '';
+        }
+        
+        function adminCriarGincana() {
+            const nome = document.getElementById('gincana-nome').value;
+            const preco = parseFloat(document.getElementById('gincana-preco').value);
+            const premio = parseFloat(document.getElementById('gincana-premio').value);
+            
+            if (!nome || !preco || !premio || preco <= 0 || premio <= 0) {
+                mostrarAdminStatus('❌ Preencha todos os campos corretamente!', 'error');
+                return;
+            }
+            
+            const novaGincana = {
+                id: gincanas.length + 1,
+                nome: nome,
+                descricao: "Nova gincana criada pelo admin",
+                preco: preco,
+                premio: premio,
+                participantes: 0,
+                status: "ativa",
+                tempoRestante: 86400
+            };
+            
+            gincanas.push(novaGincana);
+            carregarGincanas();
+            
+            mostrarAdminStatus(`✅ Gincana "${nome}" criada com sucesso!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('gincana-nome').value = '';
+            document.getElementById('gincana-preco').value = '';
+            document.getElementById('gincana-premio').value = '';
+        }
+        
+        function adminCriarRifa() {
+            const nome = document.getElementById('rifa-nome').value;
+            const preco = parseFloat(document.getElementById('rifa-preco').value);
+            const premio = document.getElementById('rifa-premio').value;
+            const tipo = document.getElementById('rifa-tipo').value;
+            
+            if (!nome || !preco || !premio || preco <= 0) {
+                mostrarAdminStatus('❌ Preencha todos os campos corretamente!', 'error');
+                return;
+            }
+            
+            if (tipo === 'tradicional') {
+                const novaRifa = {
+                    id: rifas.length + 1,
+                    nome: nome,
+                    descricao: premio,
+                    preco: preco,
+                    premio: premio,
+                    vendidos: 0,
+                    total: 100,
+                    status: "ativa",
+                    diasRestantes: 30
+                };
+                
+                rifas.push(novaRifa);
+                carregarRifas();
+            } else {
+                const novaRapidinha = {
+                    id: rapidinhas.length + 1,
+                    nome: nome,
+                    descricao: "Sorteio rápido!",
+                    preco: preco,
+                    premio: parseFloat(premio.replace(/\D/g, '')) || 500,
+                    poteAtual: 0,
+                    bilhetesVendidos: 0,
+                    status: "ativa",
+                    tempoRestante: 300
+                };
+                
+                rapidinhas.push(novaRapidinha);
+                carregarRifas();
+            }
+            
+            mostrarAdminStatus(`✅ ${tipo === 'tradicional' ? 'Rifa' : 'Rapidinha'} "${nome}" criada com sucesso!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('rifa-nome').value = '';
+            document.getElementById('rifa-preco').value = '';
+            document.getElementById('rifa-premio').value = '';
+        }
+        
+        function adminResetarRankings() {
+            if (confirm('⚠️ Tem certeza que deseja resetar TODOS os rankings?')) {
+                gerarRankingsFicticios();
+                carregarRankings();
+                mostrarAdminStatus('✅ Rankings resetados com sucesso!', 'success');
+            }
+        }
+        
+        function adminVerEstatisticas() {
+            const totalGincanas = gincanas.length;
+            const totalRifas = rifas.length + rapidinhas.length;
+            const totalParticipantes = gincanas.reduce((sum, g) => sum + g.participantes, 0);
+            const totalArrecadado = gincanas.reduce((sum, g) => sum + (g.participantes * g.preco), 0) +
+                                  rifas.reduce((sum, r) => sum + (r.vendidos * r.preco), 0) +
+                                  rapidinhas.reduce((sum, r) => sum + (r.bilhetesVendidos * r.preco), 0);
+            
+            const stats = `
+📊 ESTATÍSTICAS DO SISTEMA:
+
+🏆 Gincanas ativas: ${totalGincanas}
+🎫 Rifas ativas: ${totalRifas}
+👥 Participantes totais: ${totalParticipantes}
+💰 Total arrecadado: R$ ${totalArrecadado.toFixed(2)}
+
+📈 Usuários no ranking: 30
+🔥 Top 1 depósitos: R$ ${rankingDepositos[0]?.valor.toFixed(2) || '0.00'}
+⭐ Top 1 pontos: ${rankingPontos[0]?.pontos.toLocaleString() || '0'} pts
+🏅 Top 1 gincanas: ${rankingGincanas[0]?.vitorias || 0} vitórias
+
+✅ Sistema online há 2 anos
+🚀 ${Math.floor(Math.random() * 1000) + 500} usuários ativos hoje
+            `;
+            
+            alert(stats);
+        }
+        
+        function adminGerarUsuariosFake() {
+            const qtd = parseInt(prompt('Quantos usuários fake gerar? (1-50)')) || 10;
+            
+            // Gerar mais dados fictícios
+            for (let i = 0; i < Math.min(qtd, 50); i++) {
+                // Adicionar aos rankings
+                const nome = nomesBrasileiros[Math.floor(Math.random() * nomesBrasileiros.length)];
+                const sobrenome = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+                const nomeCompleto = `${nome} ${sobrenome}`;
+                const username = `@${nome.toLowerCase().replace(/ /g, '')}${Math.floor(Math.random() * 1000)}`;
+                
+                // Adicionar aos rankings aleatoriamente
+                if (Math.random() > 0.7) {
+                    rankingDepositos.push({
+                        posicao: rankingDepositos.length + 1,
+                        username: username,
+                        nome: nomeCompleto,
+                        valor: 100 + Math.random() * 500,
+                        online: Math.random() > 0.5,
+                        variacao: "Novo"
+                    });
+                }
+            }
+            
+            // Reordenar rankings
+            rankingDepositos.sort((a, b) => b.valor - a.valor);
+            rankingDepositos.forEach((item, index) => item.posicao = index + 1);
+            
+            carregarRankings();
+            mostrarAdminStatus(`✅ ${Math.min(qtd, 50)} usuários fake gerados!`, 'success');
+        }
+        
+        function mostrarAdminStatus(msg, type) {
+            const el = document.getElementById('admin-status');
+            el.textContent = msg;
+            el.className = `status ${type}`;
+            el.style.display = 'block';
+            
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        }
+        
+        // ==================== UTILITÁRIOS ====================
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            for (let i = 0; i < navItems.length; i++) {
+                if (navItems[i].onclick.toString().includes(pageId)) {
+                    navItems[i].classList.add('active');
+                    break;
+                }
+            }
+        }
+        
+        function mostrarStatus(msg, type) {
+            const el = document.createElement('div');
+            el.className = `status ${type}`;
+            el.textContent = msg;
+            el.style.position = 'fixed';
+            el.style.top = '20px';
+            el.style.left = '50%';
+            el.style.transform = 'translateX(-50%)';
+            el.style.zIndex = '9999';
+            el.style.maxWidth = '90%';
+            el.style.padding = '15px';
+            el.style.borderRadius = '10px';
+            el.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+            
+            document.body.appendChild(el);
+            
+            setTimeout(() => {
+                el.remove();
+            }, 3000);
+        }
+        
+        function iniciarTimers() {
+            // Timer da gincana (24h)
+            iniciarTimer('gincana-timer', 86400);
+            
+            // Timer da rifa (24h)
+            iniciarTimer('rifas-timer', 86400);
+            
+            // Timer do ranking (24h)
+            iniciarTimer('ranking-timer', 86400);
+            
+            // Timer da rapidinha (5 minutos)
+            iniciarTimer('rapidinha-timer', 300);
+        }
+        
+        function iniciarTimer(elementId, seconds) {
+            let timeLeft = seconds;
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            function updateTimer() {
+                if (timeLeft <= 0) {
+                    element.textContent = "00:00:00";
+                    element.style.color = "#ff4081";
+                    return;
+                }
+                
+                const hours = Math.floor(timeLeft / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const secs = timeLeft % 60;
+                
+                if (elementId === 'rapidinha-timer') {
+                    element.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                } else {
+                    element.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+            
+            updateTimer();
+        }
+        
+        function showNotifications() {
+            const notifications = [
+                "🎉 Nova gincana disponível! Participe agora!",
+                "💰 Seu depósito foi confirmado!",
+                "🏆 Você subiu no ranking! Continue assim!",
+                "🎁 Novo bônus disponível para missões!",
+                "⚡ Rapidinha com pote recorde! Não perca!"
+            ];
+            
+            alert("🔔 NOTIFICAÇÕES:\n\n" + notifications.join("\n\n"));
+        }
+        
+        // ==================== INICIALIZAÇÃO FINAL ====================
+        console.log("✅ RifasPay carregado com sucesso!");
+        console.log("👑 Admin: toque 7x no logo ou código ADMIN2024");
+        console.log("🎮 Sistema completo e dinâmico");
+        console.log("📊 Rankings atualizados a cada 24h");
+    </script>
+</body>
+</html>
