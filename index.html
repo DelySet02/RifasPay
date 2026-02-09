@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifasPay - Sistema Completo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+        
+        .logo-sub {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        /* Menu */
+        .nav-menu {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 0;
+            overflow-x: auto;
+        }
+        
+        .nav-item {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 15px 5px;
+            cursor: pointer;
+            color: #666;
+            font-weight: 600;
+            font-size: 12px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #1a237e;
+            border-bottom: 3px solid #1a237e;
+            background: rgba(26, 35, 126, 0.05);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        /* Content */
+        .page-content {
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #1a237e, #311b92);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+        
+        .balance-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            background: #1a237e;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: #00c853;
+        }
+        
+        .btn-warning {
+            background: #ff9800;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+        }
+        
+        .btn-purple {
+            background: #9c27b0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: #1a237e;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a237e;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Login */
+        .login-screen {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .login-title {
+            font-size: 28px;
+            color: #1a237e;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #1a237e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        /* Admin */
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4081;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+            z-index: 100;
+        }
+        
+        /* Ranking */
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        
+        .ranking-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+        
+        .rank-pos {
+            font-size: 20px;
+            font-weight: 900;
+            width: 40px;
+            text-align: center;
+            color: #1a237e;
+        }
+        
+        .rank-name {
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .rank-value {
+            font-weight: 900;
+            color: #00c853;
+            font-size: 16px;
+        }
+        
+        /* Message */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00c853;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: fadeInOut 3s;
+            display: none;
+            text-align: center;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: 0; }
+            10% { opacity: 1; top: 20px; }
+            90% { opacity: 1; top: 20px; }
+            100% { opacity: 0; top: 0; }
+        }
+        
+        .message.error {
+            background: #f44336;
+        }
+        
+        .message.warning {
+            background: #ff9800;
+        }
+        
+        /* Raspadinha */
+        .scratch-card {
+            background: linear-gradient(135deg, #ff9800, #ff5722);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .scratch-area {
+            background: #333;
+            height: 150px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            user-select: none;
+        }
+        
+        .scratch-revealed {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+        }
+        
+        /* Transaction List */
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-amount {
+            font-weight: 900;
+            font-size: 18px;
+        }
+        
+        .transaction-amount.positive {
+            color: #00c853;
+        }
+        
+        .transaction-amount.negative {
+            color: #f44336;
+        }
+        
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .game-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .game-item:hover {
+            transform: translateY(-5px);
+            border-color: #1a237e;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .game-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #1a237e;
+        }
+        
+        .game-price {
+            background: #1a237e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a237e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="message" id="message"></div>
+    
+    <div class="app-container">
+        <!-- Tela de Login -->
+        <div id="loginScreen">
+            <div class="header">
+                <div class="logo">RifasPay</div>
+                <div class="logo-sub">Jogos, Rifas e Ganhos Reais</div>
+            </div>
+            
+            <div class="login-screen">
+                <div class="login-title">🎮 Bem-vindo ao RifasPay</div>
+                
+                <div class="input-group">
+                    <label class="input-label">Nome de Usuário</label>
+                    <input type="text" id="username" class="input-field" placeholder="Digite seu nome" value="jogador">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Senha</label>
+                    <input type="password" id="password" class="input-field" placeholder="Digite sua senha" value="123456">
+                </div>
+                
+                <button class="btn btn-success" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Entrar na Conta
+                </button>
+                
+                <div style="margin: 25px 0; color: #666; font-size: 14px;">
+                    Use qualquer nome e senha para testar
+                </div>
+                
+                <div style="font-size: 12px; color: #999; margin-top: 30px;">
+                    🔒 Seus dados são salvos localmente no navegador
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal (após login) -->
+        <div id="mainContent" style="display: none;">
+            <div class="header">
+                <button class="admin-btn" id="adminBtn" onclick="showAdminModal()" title="Painel Admin">A</button>
+                
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-weight: 700; font-size: 20px;" id="welcomeName">Jogador</div>
+                    <div style="font-size: 14px; opacity: 0.8;">Boa sorte nos jogos!</div>
+                </div>
+                
+                <div class="balance-card">
+                    <div style="font-size: 14px; opacity: 0.9;">SALDO DISPONÍVEL</div>
+                    <div class="balance-amount" id="userBalance">R$ 0,00</div>
+                    
+                    <div class="balance-actions">
+                        <button class="btn btn-success" onclick="depositar()">
+                            <i class="fas fa-plus"></i> Depositar
+                        </button>
+                        <button class="btn btn-warning" onclick="sacar()">
+                            <i class="fas fa-dollar-sign"></i> Sacar
+                        </button>
+                        <button class="btn" onclick="showTab('historico')">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="showTab('inicio')">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    <div>Início</div>
+                </div>
+                <div class="nav-item" onclick="showTab('gincanas')">
+                    <div class="nav-icon"><i class="fas fa-trophy"></i></div>
+                    <div>Gincanas</div>
+                </div>
+                <div class="nav-item" onclick="showTab('raspadinha')">
+                    <div class="nav-icon"><i class="fas fa-scroll"></i></div>
+                    <div>Raspadinha</div>
+                </div>
+                <div class="nav-item" onclick="showTab('rifas')">
+                    <div class="nav-icon"><i class="fas fa-ticket-alt"></i></div>
+                    <div>Rifas</div>
+                </div>
+                <div class="nav-item" onclick="showTab('ranking')">
+                    <div class="nav-icon"><i class="fas fa-medal"></i></div>
+                    <div>Ranking</div>
+                </div>
+                <div class="nav-item" onclick="showTab('mais')">
+                    <div class="nav-icon"><i class="fas fa-ellipsis-h"></i></div>
+                    <div>Mais</div>
+                </div>
+            </div>
+            
+            <!-- Página Inicial -->
+            <div id="inicioTab" class="page-content">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-gamepad"></i> Jogos em Destaque
+                    </div>
+                    
+                    <div class="game-grid">
+                        <div class="game-item" onclick="jogarRaspadinha(2)">
+                            <div class="game-icon"><i class="fas fa-scroll"></i></div>
+                            <div style="font-weight: 600;">Raspadinha</div>
+                            <div style="font-size: 14px; color: #666; margin: 5px 0;">Prêmios até R$ 50</div>
+                            <div class="game-price">R$ 2,00</div>
+                        </div>
+                        
+                        <div class="game-item" onclick="participarGincana(15)">
+                            <div class="game-icon"><i class="fas fa-trophy"></i></div>
+                            <div style="font-weight: 600;">Gincana 7 Dias</div>
+                            <div style="font-size: 14px; color: #666; margin: 5px 0;">Prêmio R$ 1.500</div>
+                            <div class="game-price">R$ 15,00</div>
+                        </div>
+                        
+                        <div class="game-item" onclick="comprarRifa(10)">
+                            <div class="game-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <div style="font-weight: 600;">Rifa PS5</div>
+                            <div style="font-size: 14px; color: #666; margin: 5px 0;">Sorteio em 5 dias</div>
+                            <div class="game-price">R$ 10,00</div>
+                        </div>
+                        
+                        <div class="game-item" onclick="comprarRapidinha(2)">
+                            <div class="game-icon"><i class="fas fa-bolt"></i></div>
+                            <div style="font-weight: 600;">Rapidinha</div>
+                            <div style="font-size: 14px; color: #666; margin: 5px 0;">Sorteio em 5 min</div>
+                            <div class="game-price">R$ 2,00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-gift"></i> Convide e Ganhe
+                    </div>
+                    <div style="text-align: center; padding: 15px 0;">
+                        <div style="font-size: 32px; color: #00c853; font-weight: 900; margin: 10px 0;">R$ 10,00</div>
+                        <div style="color: #666; margin-bottom: 15px;">
+                            Ganhe <strong>R$ 10,00</strong> por cada amigo que se cadastrar!
+                        </div>
+                        <button class="btn btn-warning" onclick="mostrarConvite()">
+                            <i class="fas fa-share-alt"></i> Ver Meu Link de Convite
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> Últimas Transações
+                    </div>
+                    <div id="ultimasTransacoes">
+                        <!-- Carregado por JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página Gincanas -->
+            <div id="gincanasTab" class="page-content" style="display: none;">
+                <div class="loading" id="gincanasLoading">
+                    <div class="loader"></div>
+                    <div>Carregando gincanas...</div>
+                </div>
+                
+                <div id="gincanasList">
+                    <!-- Gincanas carregadas por JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Página Raspadinha -->
+            <div id="raspadinhaTab" class="page-content" style="display: none;">
+                <div class="scratch-card">
+                    <div class="card-title" style="color: white;">
+                        <i class="fas fa-scroll"></i> Raspadinha da Sorte
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        Arraste o dedo para revelar seu prêmio!
+                    </div>
+                    
+                    <div class="scratch-area" id="scratchArea" onmousedown="startScratch(event)" onmousemove="scratch(event)" onmouseup="endScratch()" ontouchstart="startScratch(event)" ontouchmove="scratch(event)" ontouchend="endScratch()">
+                        🎯 ARRASTE AQUI
+                    </div>
+                    
+                    <div id="scratchResult" style="display: none; margin-top: 15px;">
+                        <div style="font-size: 24px; font-weight: 900;" id="prizeAmount">R$ 0,00</div>
+                        <div id="prizeMessage">Prêmio revelado!</div>
+                    </div>
+                    
+                    <div class="stats" style="background: rgba(255,255,255,0.2); color: white;">
+                        <div class="stat-item">
+                            <div class="stat-value" id="scratchPrice">R$ 2,00</div>
+                            <div class="stat-label">Preço</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="scratchChance">70%</div>
+                            <div class="stat-label">Chance de ganhar</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="scratchMax">R$ 50</div>
+                            <div class="stat-label">Prêmio máximo</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" style="background: white; color: #ff9800; margin-top: 15px;" onclick="comprarRaspadinha(2)" id="scratchBuyBtn">
+                        <i class="fas fa-shopping-cart"></i> Comprar Raspadinha
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> Histórico de Raspadinhas
+                    </div>
+                    <div id="scratchHistory">
+                        <!-- Carregado por JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página Rifas -->
+            <div id="rifasTab" class="page-content" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-gamepad"></i> PlayStation 5
+                    </div>
+                    <div style="color: #666; margin-bottom: 15px;">
+                        1x PlayStation 5 Digital Edition - Sorteio em 5 dias
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">R$ 10</div>
+                            <div class="stat-label">Por número</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">47%</div>
+                            <div class="stat-label">Vendidos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5 dias</div>
+                            <div class="stat-label">Restantes</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="comprarRifa(10)">
+                        <i class="fas fa-shopping-cart"></i> Comprar Número (R$ 10,00)
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-bolt"></i> Rapidinha R$ 500
+                    </div>
+                    <div style="color: #666; margin-bottom: 15px;">
+                        Sorteio a cada 5 minutos! 70% do pote para o ganhador.
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">R$ 2</div>
+                            <div class="stat-label">Por bilhete</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">225</div>
+                            <div class="stat-label">Bilhetes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">R$ 450</div>
+                            <div class="stat-label">Pote atual</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" style="background: linear-gradient(135deg, #ff4081, #f50057);" onclick="comprarRapidinha(2)">
+                        <i class="fas fa-bolt"></i> Comprar Bilhete (R$ 2,00)
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Página Ranking -->
+            <div id="rankingTab" class="page-content" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-medal"></i> Top 10 Depositantes
+                    </div>
+                    <div style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                        Ranking atualizado a cada 24 horas
+                    </div>
+                    
+                    <div id="rankingList">
+                        <!-- Carregado por JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-user"></i> Sua Posição no Ranking
+                    </div>
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 14px; color: #666;">Você está na posição</div>
+                        <div style="font-size: 48px; font-weight: 900; color: #1a237e; margin: 10px 0;" id="userRank">#25</div>
+                        <div style="font-size: 18px; color: #666;" id="userRankValue">R$ 0,00 depositados</div>
+                        
+                        <button class="btn" style="margin-top: 15px;" onclick="atualizarRanking()">
+                            <i class="fas fa-sync-alt"></i> Atualizar Ranking
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Página Mais / Histórico -->
+            <div id="maisTab" class="page-content" style="display: none;">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-user-circle"></i> Meu Perfil
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #1a237e, #311b92); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; margin: 0 auto 15px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        
+                        <div style="font-size: 20px; font-weight: 900;" id="profileName">Jogador</div>
+                        <div style="color: #666; margin: 5px 0;" id="profileUsername">@jogador</div>
+                        <div style="font-size: 14px; color: #999;" id="profileSince">Membro desde hoje</div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileDeposits">R$ 0</div>
+                            <div class="stat-label">Depositado</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileWithdraws">R$ 0</div>
+                            <div class="stat-label">Sacado</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileGames">0</div>
+                            <div class="stat-label">Jogos</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> Histórico Completo
+                    </div>
+                    <div id="fullHistory">
+                        <!-- Carregado por JavaScript -->
+                    </div>
+                </div>
+                
+                <button class="btn btn-danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair da Conta
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Admin -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">👑 Painel Administrativo</div>
+            
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="adminUser" placeholder="ID ou Nome do Usuário" class="input-field" style="margin-bottom: 10px;">
+                <input type="number" id="adminAmount" placeholder="Valor (R$)" class="input-field" style="margin-bottom: 10px;">
+                <button class="btn btn-success" onclick="adicionarSaldo()">
+                    <i class="fas fa-plus"></i> Adicionar Saldo
+                </button>
+                <button class="btn btn-warning" onclick="removerSaldo()" style="margin-top: 10px;">
+                    <i class="fas fa-minus"></i> Remover Saldo
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: 600; margin-bottom: 10px;">Criar Gincana:</div>
+                <input type="text" id="gincanaNome" placeholder="Nome da Gincana" class="input-field" style="margin-bottom: 10px;">
+                <input type="number" id="gincanaPreco" placeholder="Preço (R$)" class="input-field" style="margin-bottom: 10px;">
+                <input type="number" id="gincanaPremio" placeholder="Prêmio (R$)" class="input-field" style="margin-bottom: 10px;">
+                <button class="btn" onclick="criarGincana()">
+                    <i class="fas fa-plus"></i> Criar Gincana
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: 600; margin-bottom: 10px;">Controles:</div>
+                <button class="btn" onclick="gerarUsuariosFake()" style="margin-bottom: 10px;">
+                    <i class="fas fa-users"></i> Gerar Usuários Fake
+                </button>
+                <button class="btn btn-warning" onclick="verEstatisticas()">
+                    <i class="fas fa-chart-bar"></i> Ver Estatísticas
+                </button>
+            </div>
+            
+            <button class="btn btn-danger" onclick="fecharModal('adminModal')">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal Saque -->
+    <div id="saqueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">💸 Solicitar Saque</div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="color: #666; margin-bottom: 10px;">Saldo disponível: <strong id="availableBalance">R$ 0,00</strong></div>
+                <input type="number" id="saqueAmount" placeholder="Valor para sacar (R$)" class="input-field" style="margin-bottom: 10px;">
+                <input type="text" id="saqueChave" placeholder="Chave PIX (CPF, Email, Telefone)" class="input-field" style="margin-bottom: 10px;">
+                <select id="saqueTipo" class="input-field" style="margin-bottom: 10px;">
+                    <option value="cpf">CPF</option>
+                    <option value="email">E-mail</option>
+                    <option value="telefone">Telefone</option>
+                </select>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Taxas:</div>
+                    <div style="font-size: 12px; color: #999;">• Taxa de saque: R$ 1,00</div>
+                    <div style="font-size: 12px; color: #999;">• Valor mínimo: R$ 20,00</div>
+                    <div style="font-size: 12px; color: #999;">• Processamento: 24 horas úteis</div>
+                </div>
+                
+                <button class="btn btn-success" onclick="solicitarSaque()">
+                    <i class="fas fa-check"></i> Solicitar Saque
+                </button>
+            </div>
+            
+            <button class="btn" onclick="fecharModal('saqueModal')">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal Convite -->
+    <div id="conviteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">🎁 Convide e Ganhe</div>
+            
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 48px; color: #00c853; margin: 20px 0;">R$ 10,00</div>
+                <div style="color: #666; margin-bottom: 20px;">
+                    Ganhe <strong>R$ 10,00</strong> por cada amigo que se cadastrar e depositar!
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 5px;">SEU LINK DE CONVITE:</div>
+                    <div style="font-size: 16px; font-weight: 600; word-break: break-all;" id="inviteLink">https://rifaspay.com/?ref=INVITE123</div>
+                </div>
+                
+                <button class="btn btn-warning" onclick="copiarConvite()">
+                    <i class="fas fa-copy"></i> Copiar Link
+                </button>
+                
+                <div style="margin-top: 20px; font-size: 12px; color: #999;">
+                    Seus amigos também ganham R$ 5,00 de bônus!
+                </div>
+            </div>
+            
+            <button class="btn" onclick="fecharModal('conviteModal')">
+                <i class="fas fa-times"></i> Fechar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== VARIÁVEIS GLOBAIS ====================
+        let usuarioAtual = null;
+        let usuarios = JSON.parse(localStorage.getItem('rifaspay_usuarios')) || [];
+        let transacoes = JSON.parse(localStorage.getItem('rifaspay_transacoes')) || [];
+        let gincanas = JSON.parse(localStorage.getItem('rifaspay_gincanas')) || [];
+        let adminAtivo = false;
+        let tapCount = 0;
+        let lastTap = 0;
+        let isScratching = false;
+        let scratchRevealed = false;
+        let scratchPrize = 0;
+
+        // Nomes para usuários fake
+        const nomesFake = [
+            "João Silva", "Maria Santos", "Pedro Oliveira", "Ana Costa", "Lucas Pereira",
+            "Julia Rodrigues", "Carlos Souza", "Fernanda Lima", "Rafael Almeida", "Amanda Ferreira",
+            "Bruno Ribeiro", "Patrícia Cardoso", "Rodrigo Martins", "Isabela Gomes", "Marcos Lopes",
+            "Camila Castro", "Daniel Dias", "Larissa Rocha", "Felipe Nunes", "Vanessa Moreira",
+            "Ricardo Santos", "Beatriz Oliveira", "Gustavo Lima", "Carolina Souza", "Roberto Almeida",
+            "Tatiane Pereira", "Leonardo Costa", "Mariana Rodrigues", "Alexandre Ferreira", "Cristina Gomes"
+        ];
+
+        // ==================== INICIALIZAÇÃO ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 RifasPay iniciando...');
+            
+            // Verificar se já está logado
+            const usuarioSalvo = localStorage.getItem('rifaspay_usuario');
+            if (usuarioSalvo) {
+                usuarioAtual = JSON.parse(usuarioSalvo);
+                iniciarSistema();
+            }
+            
+            // Configurar clique secreto no logo para admin
+            document.querySelector('.logo').addEventListener('click', function(e) {
+                const now = Date.now();
+                if (now - lastTap < 500) {
+                    tapCount++;
+                } else {
+                    tapCount = 1;
+                }
+                lastTap = now;
+                
+                if (tapCount >= 7) {
+                    const senha = prompt('🔐 Digite a senha admin:');
+                    if (senha === 'ADMIN2024') {
+                        adminAtivo = true;
+                        document.getElementById('adminBtn').style.display = 'block';
+                        showMessage('👑 Modo admin ativado! Painel disponível.', 'success');
+                    } else {
+                        showMessage('❌ Senha incorreta!', 'error');
+                    }
+                    tapCount = 0;
+                }
+            });
+            
+            // Inicializar dados se não existirem
+            if (usuarios.length === 0) {
+                criarDadosIniciais();
+            }
+            
+            // Inicializar gincanas se não existirem
+            if (gincanas.length === 0) {
+                criarGincanasIniciais();
+            }
+            
+            console.log('✅ Sistema pronto para jogar!');
+        });
+
+        // ==================== FUNÇÕES DE LOGIN ====================
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showMessage('❌ Preencha usuário e senha!', 'error');
+                return;
+            }
+            
+            // Verificar se usuário existe
+            let usuario = usuarios.find(u => u.username.toLowerCase() === username.toLowerCase());
+            
+            if (!usuario) {
+                // Criar novo usuário
+                usuario = {
+                    id: Date.now(),
+                    username: username,
+                    nome: username.charAt(0).toUpperCase() + username.slice(1),
+                    saldo: 10.00, // Saldo inicial
+                    totalDepositado: 0,
+                    totalSacado: 0,
+                    totalJogos: 0,
+                    convites: 0,
+                    criadoEm: new Date().toISOString(),
+                    isAdmin: username.toLowerCase() === 'admin',
+                    raspadinhas: [],
+                    rifas: []
+                };
+                usuarios.push(usuario);
+                salvarDados();
+                
+                // Registrar transação inicial
+                registrarTransacao(usuario.id, 10.00, 'bonus_inicial', 'Bônus de boas-vindas');
+            }
+            
+            usuarioAtual = usuario;
+            localStorage.setItem('rifaspay_usuario', JSON.stringify(usuario));
+            iniciarSistema();
+            showMessage(`✅ Bem-vindo, ${usuario.nome}! Bônus de R$ 10,00 ativado.`, 'success');
+        }
+        
+        function iniciarSistema() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            atualizarInterface();
+            carregarUltimasTransacoes();
+            carregarRanking();
+            carregarGincanas();
+            
+            // Se for admin, mostrar botão
+            if (usuarioAtual.isAdmin || adminAtivo) {
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+        }
+        
+        function logout() {
+            if (confirm('Deseja sair da conta?')) {
+                localStorage.removeItem('rifaspay_usuario');
+                location.reload();
+            }
+        }
+        
+        // ==================== FUNÇÕES PRINCIPAIS ====================
+        function showTab(tab) {
+            // Esconder todas as tabs
+            document.querySelectorAll('.page-content').forEach(t => {
+                t.style.display = 'none';
+            });
+            
+            // Remover active de todos os itens do menu
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Mostrar tab selecionada
+            document.getElementById(tab + 'Tab').style.display = 'block';
+            
+            // Ativar item do menu
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.onclick.toString().includes(tab)) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Carregar conteúdo específico da tab
+            switch(tab) {
+                case 'inicio':
+                    carregarUltimasTransacoes();
+                    break;
+                case 'gincanas':
+                    carregarGincanas();
+                    break;
+                case 'raspadinha':
+                    carregarHistoricoRaspadinhas();
+                    break;
+                case 'ranking':
+                    carregarRanking();
+                    break;
+                case 'mais':
+                    carregarPerfil();
+                    carregarHistoricoCompleto();
+                    break;
+            }
+        }
+        
+        function atualizarInterface() {
+            document.getElementById('welcomeName').textContent = usuarioAtual.nome;
+            document.getElementById('userBalance').textContent = `R$ ${usuarioAtual.saldo.toFixed(2)}`;
+            document.getElementById('availableBalance').textContent = `R$ ${usuarioAtual.saldo.toFixed(2)}`;
+            document.getElementById('inviteLink').textContent = `https://rifaspay.com/?ref=${usuarioAtual.id}`;
+            document.getElementById('profileName').textContent = usuarioAtual.nome;
+            document.getElementById('profileUsername').textContent = `@${usuarioAtual.username}`;
+        }
+        
+        // ==================== SISTEMA DE DEPÓSITO ====================
+        function depositar() {
+            const valor = parseFloat(prompt('Digite o valor do depósito (mínimo R$ 10):'));
+            
+            if (!valor || valor < 10) {
+                showMessage('❌ Valor mínimo: R$ 10,00', 'error');
+                return;
+            }
+            
+            usuarioAtual.saldo += valor;
+            usuarioAtual.totalDepositado += valor;
+            
+            // Registrar transação
+            registrarTransacao(usuarioAtual.id, valor, 'deposito', 'Depósito na conta');
+            
+            salvarDados();
+            atualizarInterface();
+            carregarRanking();
+            carregarUltimasTransacoes();
+            showMessage(`✅ Depósito de R$ ${valor.toFixed(2)} realizado!`, 'success');
+        }
+        
+        // ==================== SISTEMA DE SAQUE ====================
+        function sacar() {
+            // Verificar saldo mínimo
+            if (usuarioAtual.saldo < 20) {
+                showMessage('❌ Saldo insuficiente! Mínimo R$ 20,00 para saque.', 'error');
+                return;
+            }
+            
+            document.getElementById('saqueModal').style.display = 'flex';
+        }
+        
+        function solicitarSaque() {
+            const valor = parseFloat(document.getElementById('saqueAmount').value);
+            const chave = document.getElementById('saqueChave').value.trim();
+            const tipo = document.getElementById('saqueTipo').value;
+            
+            if (!valor || valor < 20) {
+                showMessage('❌ Valor mínimo para saque: R$ 20,00', 'error');
+                return;
+            }
+            
+            if (valor > usuarioAtual.saldo) {
+                showMessage('❌ Saldo insuficiente para este saque!', 'error');
+                return;
+            }
+            
+            if (!chave) {
+                showMessage('❌ Informe a chave PIX!', 'error');
+                return;
+            }
+            
+            const taxa = 1.00;
+            const total = valor + taxa;
+            
+            if (total > usuarioAtual.saldo) {
+                showMessage(`❌ Saldo insuficiente! Valor + taxa: R$ ${total.toFixed(2)}`, 'error');
+                return;
+            }
+            
+            if (confirm(`Solicitar saque de R$ ${valor.toFixed(2)} para ${tipo}: ${chave}?\nTaxa: R$ ${taxa.toFixed(2)}\nTotal debitado: R$ ${total.toFixed(2)}`)) {
+                // Debitar valor + taxa
+                usuarioAtual.saldo -= total;
+                usuarioAtual.totalSacado += valor;
+                
+                // Registrar transação de saque
+                registrarTransacao(usuarioAtual.id, -total, 'saque', `Saque via PIX (${tipo}: ${chave})`);
+                
+                // Registrar transação da taxa
+                registrarTransacao(usuarioAtual.id, -taxa, 'taxa_saque', 'Taxa de processamento');
+                
+                salvarDados();
+                atualizarInterface();
+                carregarUltimasTransacoes();
+                fecharModal('saqueModal');
+                
+                showMessage(`✅ Saque de R$ ${valor.toFixed(2)} solicitado! Processamento em até 24h.`, 'success');
+                
+                // Limpar campos
+                document.getElementById('saqueAmount').value = '';
+                document.getElementById('saqueChave').value = '';
+            }
+        }
+        
+        // ==================== SISTEMA DE JOGOS ====================
+        function jogarRaspadinha(preco) {
+            if (usuarioAtual.saldo < preco) {
+                showMessage('❌ Saldo insuficiente para jogar!', 'error');
+                return;
+            }
+            
+            showTab('raspadinha');
+        }
+        
+        function comprarRaspadinha(preco) {
+            if (usuarioAtual.saldo < preco) {
+                showMessage('❌ Saldo insuficiente!', 'error');
+                return;
+            }
+            
+            if (!confirm(`Comprar raspadinha por R$ ${preco.toFixed(2)}?`)) {
+                return;
+            }
+            
+            usuarioAtual.saldo -= preco;
+            usuarioAtual.totalJogos += 1;
+            
+            // Registrar transação
+            registrarTransacao(usuarioAtual.id, -preco, 'raspadinha', 'Compra de raspadinha');
+            
+            // Salvar raspadinha comprada
+            if (!usuarioAtual.raspadinhas) usuarioAtual.raspadinhas = [];
+            usuarioAtual.raspadinhas.push({
+                id: Date.now(),
+                data: new Date().toISOString(),
+                preco: preco,
+                status: 'comprada'
+            });
+            
+            salvarDados();
+            atualizarInterface();
+            
+            // Resetar raspadinha
+            resetarRaspadinha();
+            
+            showMessage(`✅ Raspadinha comprada! Arraste para revelar.`, 'success');
+        }
+        
+        function startScratch(e) {
+            if (scratchRevealed || !usuarioAtual.raspadinhas || usuarioAtual.raspadinhas.length === 0) {
+                return;
+            }
+            isScratching = true;
+            scratch(e);
+        }
+        
+        function scratch(e) {
+            if (!isScratching || scratchRevealed) return;
+            
+            const area = document.getElementById('scratchArea');
+            const result = document.getElementById('scratchResult');
+            const prizeAmount = document.getElementById('prizeAmount');
+            const prizeMessage = document.getElementById('prizeMessage');
+            
+            // Simular raspagem
+            area.classList.add('scratch-revealed');
+            
+            // Gerar prêmio aleatório (70% de chance de ganhar)
+            const ganhou = Math.random() < 0.7;
+            if (ganhou) {
+                // Prêmio entre R$ 1 e R$ 50
+                scratchPrize = Math.floor(Math.random() * 50) + 1;
+                prizeAmount.textContent = `R$ ${scratchPrize.toFixed(2)}`;
+                prizeMessage.textContent = '🎉 Parabéns! Você ganhou!';
+                
+                // Adicionar prêmio ao saldo
+                usuarioAtual.saldo += scratchPrize;
+                registrarTransacao(usuarioAtual.id, scratchPrize, 'premio_raspadinha', `Prêmio raspadinha: R$ ${scratchPrize.toFixed(2)}`);
+            } else {
+                scratchPrize = 0;
+                prizeAmount.textContent = 'R$ 0,00';
+                prizeMessage.textContent = '😢 Não foi dessa vez! Tente novamente.';
+            }
+            
+            result.style.display = 'block';
+            scratchRevealed = true;
+            
+            // Atualizar histórico da raspadinha
+            if (usuarioAtual.raspadinhas && usuarioAtual.raspadinhas.length > 0) {
+                const ultimaRaspadinha = usuarioAtual.raspadinhas[usuarioAtual.raspadinhas.length - 1];
+                ultimaRaspadinha.status = 'usada';
+                ultimaRaspadinha.premio = scratchPrize;
+                ultimaRaspadinha.reveladaEm = new Date().toISOString();
+            }
+            
+            salvarDados();
+            atualizarInterface();
+            carregarHistoricoRaspadinhas();
+        }
+        
+        function endScratch() {
+            isScratching = false;
+        }
+        
+        function resetarRaspadinha() {
+            const area = document.getElementById('scratchArea');
+            const result = document.getElementById('scratchResult');
+            
+            area.classList.remove('scratch-revealed');
+            area.textContent = '🎯 ARRASTE AQUI';
+            result.style.display = 'none';
+            scratchRevealed = false;
+            scratchPrize = 0;
+        }
+        
+        function participarGincana(preco) {
+            if (usuarioAtual.saldo < preco) {
+                showMessage('❌ Saldo insuficiente!', 'error');
+                return;
+            }
+            
+            if (!confirm(`Participar na gincana por R$ ${preco.toFixed(2)}?`)) {
+                return;
+            }
+            
+            usuarioAtual.saldo -= preco;
+            usuarioAtual.totalJogos += 1;
+            
+            // Registrar transação
+            registrarTransacao(usuarioAtual.id, -preco, 'gincana', 'Inscrição em gincana');
+            
+            salvarDados();
+            atualizarInterface();
+            carregarUltimasTransacoes();
+            showMessage(`✅ Inscrição na gincana realizada! Boa sorte!`, 'success');
+        }
+        
+        function comprarRifa(preco) {
+            if (usuarioAtual.saldo < preco) {
+                showMessage('❌ Saldo insuficiente!', 'error');
+                return;
+            }
+            
+            if (!confirm(`Comprar número da rifa por R$ ${preco.toFixed(2)}?`)) {
+                return;
+            }
+            
+            usuarioAtual.saldo -= preco;
+            usuarioAtual.totalJogos += 1;
+            
+            // Registrar transação
+            registrarTransacao(usuarioAtual.id, -preco, 'rifa', 'Compra de número de rifa');
+            
+            salvarDados();
+            atualizarInterface();
+            showMessage(`✅ Número comprado com sucesso!`, 'success');
+        }
+        
+        function comprarRapidinha(preco) {
+            if (usuarioAtual.saldo < preco) {
+                showMessage('❌ Saldo insuficiente!', 'error');
+                return;
+            }
+            
+            if (!confirm(`Comprar bilhete da rapidinha por R$ ${preco.toFixed(2)}?`)) {
+                return;
+            }
+            
+            usuarioAtual.saldo -= preco;
+            usuarioAtual.totalJogos += 1;
+            
+            // Registrar transação
+            registrarTransacao(usuarioAtual.id, -preco, 'rapidinha', 'Compra de bilhete da rapidinha');
+            
+            salvarDados();
+            atualizarInterface();
+            showMessage(`✅ Bilhete comprado! Boa sorte no sorteio!`, 'success');
+        }
+        
+        // ==================== SISTEMA DE RANKING ====================
+        function carregarRanking() {
+            // Ordenar usuários por total depositado (apenas os que têm depósitos)
+            const usuariosComDepositos = usuarios.filter(u => u.totalDepositado > 0);
+            
+            // Gerar ranking fake para os que não têm depósitos suficientes
+            const rankingFake = [...Array(20)].map((_, i) => ({
+                username: `user${i + 1}`,
+                nome: nomesFake[i % nomesFake.length],
+                totalDepositado: 50 + Math.random() * 500,
+                posicao: i + 1
+            }));
+            
+            // Combinar com usuários reais
+            let ranking = [
+                ...usuariosComDepositos.map(u => ({
+                    username: u.username,
+                    nome: u.nome,
+                    totalDepositado: u.totalDepositado,
+                    isCurrent: u.id === usuarioAtual?.id
+                })),
+                ...rankingFake
+            ];
+            
+            // Ordenar por total depositado e pegar top 10
+            ranking.sort((a, b) => b.totalDepositado - a.totalDepositado);
+            ranking = ranking.slice(0, 10);
+            
+            const container = document.getElementById('rankingList');
+            container.innerHTML = '';
+            
+            ranking.forEach((user, index) => {
+                const isCurrent = user.isCurrent;
+                const item = document.createElement('div');
+                item.className = 'ranking-item';
+                item.innerHTML = `
+                    <div class="rank-pos">#${index + 1}</div>
+                    <div class="rank-name">
+                        ${user.username} ${isCurrent ? '<span style="color: #ff4081;">(Você)</span>' : ''}
+                        <div style="font-size: 12px; color: #666;">${user.nome}</div>
+                    </div>
+                    <div class="rank-value">R$ ${user.totalDepositado.toFixed(2)}</div>
+                `;
+                container.appendChild(item);
+            });
+            
+            // Atualizar posição do usuário atual (sempre abaixo de 30)
+            const userRank = Math.min(usuariosComDepositos.length > 0 ? 
+                usuariosComDepositos.sort((a, b) => b.totalDepositado - a.totalDepositado)
+                    .findIndex(u => u.id === usuarioAtual.id) + 1 : 25, 30);
+            
+            document.getElementById('userRank').textContent = `#${userRank}`;
+            document.getElementById('userRankValue').textContent = `R$ ${usuarioAtual?.totalDepositado?.toFixed(2) || '0,00'} depositados`;
+        }
+        
+        function atualizarRanking() {
+            carregarRanking();
+            showMessage('✅ Ranking atualizado!', 'success');
+        }
+        
+        // ==================== HISTÓRICOS ====================
+        function carregarUltimasTransacoes() {
+            const container = document.getElementById('ultimasTransacoes');
+            const userTransacoes = transacoes
+                .filter(t => t.userId === usuarioAtual.id)
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            if (userTransacoes.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nenhuma transação recente</div>';
+                return;
+            }
+            
+            userTransacoes.forEach(trans => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                
+                const tipoText = {
+                    'deposito': 'Depósito',
+                    'saque': 'Saque',
+                    'bonus_inicial': 'Bônus Inicial',
+                    'raspadinha': 'Raspadinha',
+                    'gincana': 'Gincana',
+                    'rifa': 'Rifa',
+                    'rapidinha': 'Rapidinha',
+                    'premio_raspadinha': 'Prêmio Raspadinha',
+                    'taxa_saque': 'Taxa de Saque',
+                    'admin_add': 'Adição Admin',
+                    'admin_remove': 'Remoção Admin'
+                }[trans.tipo] || trans.tipo;
+                
+                const data = new Date(trans.data).toLocaleDateString('pt-BR');
+                
+                item.innerHTML = `
+                    <div class="transaction-info">
+                        <div style="font-weight: 600;">${tipoText}</div>
+                        <div style="font-size: 12px; color: #666;">${data}</div>
+                    </div>
+                    <div class="transaction-amount ${trans.valor >= 0 ? 'positive' : 'negative'}">
+                        ${trans.valor >= 0 ? '+' : ''}R$ ${Math.abs(trans.valor).toFixed(2)}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function carregarHistoricoCompleto() {
+            const container = document.getElementById('fullHistory');
+            const userTransacoes = transacoes
+                .filter(t => t.userId === usuarioAtual.id)
+                .sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            container.innerHTML = '';
+            
+            if (userTransacoes.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nenhuma transação realizada</div>';
+                return;
+            }
+            
+            userTransacoes.forEach(trans => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                
+                const tipoText = {
+                    'deposito': 'Depósito',
+                    'saque': 'Saque',
+                    'bonus_inicial': 'Bônus Inicial',
+                    'raspadinha': 'Raspadinha',
+                    'gincana': 'Gincana',
+                    'rifa': 'Rifa',
+                    'rapidinha': 'Rapidinha',
+                    'premio_raspadinha': 'Prêmio Raspadinha',
+                    'taxa_saque': 'Taxa de Saque',
+                    'admin_add': 'Adição Admin',
+                    'admin_remove': 'Remoção Admin'
+                }[trans.tipo] || trans.tipo;
+                
+                const data = new Date(trans.data).toLocaleDateString('pt-BR');
+                const hora = new Date(trans.data).toLocaleTimeString('pt-BR');
+                
+                item.innerHTML = `
+                    <div class="transaction-info">
+                        <div style="font-weight: 600;">${tipoText}</div>
+                        <div style="font-size: 12px; color: #666;">${data} ${hora}</div>
+                        <div style="font-size: 12px; color: #999;">${trans.descricao || ''}</div>
+                    </div>
+                    <div class="transaction-amount ${trans.valor >= 0 ? 'positive' : 'negative'}">
+                        ${trans.valor >= 0 ? '+' : ''}R$ ${Math.abs(trans.valor).toFixed(2)}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function carregarHistoricoRaspadinhas() {
+            const container = document.getElementById('scratchHistory');
+            
+            if (!usuarioAtual.raspadinhas || usuarioAtual.raspadinhas.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nenhuma raspadinha comprada</div>';
+                return;
+            }
+            
+            const raspadinhas = [...usuarioAtual.raspadinhas]
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            raspadinhas.forEach(rasp => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                
+                const data = new Date(rasp.data).toLocaleDateString('pt-BR');
+                const status = rasp.status === 'comprada' ? 'Não revelada' : 
+                              rasp.premio > 0 ? `Ganhou R$ ${rasp.premio.toFixed(2)}` : 'Não ganhou';
+                
+                item.innerHTML = `
+                    <div class="transaction-info">
+                        <div style="font-weight: 600;">Raspadinha</div>
+                        <div style="font-size: 12px; color: #666;">${data}</div>
+                        <div style="font-size: 12px; color: #999;">${status}</div>
+                    </div>
+                    <div class="transaction-amount negative">
+                        -R$ ${rasp.preco.toFixed(2)}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function carregarPerfil() {
+            document.getElementById('profileDeposits').textContent = `R$ ${usuarioAtual.totalDepositado.toFixed(2)}`;
+            document.getElementById('profileWithdraws').textContent = `R$ ${usuarioAtual.totalSacado.toFixed(2)}`;
+            document.getElementById('profileGames').textContent = usuarioAtual.totalJogos;
+            
+            const dataCriacao = new Date(usuarioAtual.criadoEm);
+            const hoje = new Date();
+            const diffTime = Math.abs(hoje - dataCriacao);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('profileSince').textContent = 
+                diffDays === 1 ? 'Membro desde hoje' : `Membro há ${diffDays} dias`;
+        }
+        
+        // ==================== SISTEMA DE GINCANAS ====================
+        function carregarGincanas() {
+            const container = document.getElementById('gincanasList');
+            const loading = document.getElementById('gincanasLoading');
+            
+            if (!gincanas || gincanas.length === 0) {
+                criarGincanasIniciais();
+            }
+            
+            container.innerHTML = '';
+            loading.style.display = 'none';
+            
+            gincanas.forEach(gincana => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-title">
+                        <i class="fas fa-trophy"></i> ${gincana.nome}
+                    </div>
+                    <div style="color: #666; margin-bottom: 15px;">
+                        ${gincana.descricao}
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">R$ ${gincana.preco.toFixed(2)}</div>
+                            <div class="stat-label">Inscrição</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">R$ ${gincana.premio.toFixed(2)}</div>
+                            <div class="stat-label">Prêmio</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${gincana.participantes}</div>
+                            <div class="stat-label">Participantes</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-warning" onclick="participarGincana(${gincana.preco})">
+                        <i class="fas fa-play-circle"></i> Participar (R$ ${gincana.preco.toFixed(2)})
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // ==================== PAINEL ADMIN ====================
+        function showAdminModal() {
+            if (!usuarioAtual.isAdmin && !adminAtivo) {
+                const senha = prompt('🔐 Senha admin:');
+                if (senha !== 'ADMIN2024') {
+                    showMessage('❌ Acesso negado!', 'error');
+                    return;
+                }
+                adminAtivo = true;
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+        
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function adicionarSaldo() {
+            const userInput = document.getElementById('adminUser').value;
+            const amount = parseFloat(document.getElementById('adminAmount').value);
+            
+            if (!userInput || !amount || amount <= 0) {
+                showMessage('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            // Encontrar usuário
+            let user = usuarios.find(u => 
+                u.username.toLowerCase().includes(userInput.toLowerCase()) || 
+                u.id.toString() === userInput ||
+                u.nome.toLowerCase().includes(userInput.toLowerCase())
+            );
+            
+            if (!user) {
+                showMessage('❌ Usuário não encontrado!', 'error');
+                return;
+            }
+            
+            user.saldo += amount;
+            user.totalDepositado += amount;
+            
+            // Registrar transação
+            registrarTransacao(user.id, amount, 'admin_add', `Adição via admin por: ${usuarioAtual.username}`);
+            
+            salvarDados();
+            
+            // Se for o usuário atual, atualizar interface
+            if (user.id === usuarioAtual.id) {
+                usuarioAtual = user;
+                atualizarInterface();
+            }
+            
+            carregarRanking();
+            showMessage(`✅ R$ ${amount.toFixed(2)} adicionados a ${user.username}!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminAmount').value = '';
+        }
+        
+        function removerSaldo() {
+            const userInput = document.getElementById('adminUser').value;
+            const amount = parseFloat(document.getElementById('adminAmount').value);
+            
+            if (!userInput || !amount || amount <= 0) {
+                showMessage('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            // Encontrar usuário
+            let user = usuarios.find(u => 
+                u.username.toLowerCase().includes(userInput.toLowerCase()) || 
+                u.id.toString() === userInput ||
+                u.nome.toLowerCase().includes(userInput.toLowerCase())
+            );
+            
+            if (!user) {
+                showMessage('❌ Usuário não encontrado!', 'error');
+                return;
+            }
+            
+            if (user.saldo < amount) {
+                showMessage(`❌ Usuário só tem R$ ${user.saldo.toFixed(2)} de saldo!`, 'error');
+                return;
+            }
+            
+            user.saldo -= amount;
+            
+            // Registrar transação
+            registrarTransacao(user.id, -amount, 'admin_remove', `Remoção via admin por: ${usuarioAtual.username}`);
+            
+            salvarDados();
+            
+            // Se for o usuário atual, atualizar interface
+            if (user.id === usuarioAtual.id) {
+                usuarioAtual = user;
+                atualizarInterface();
+            }
+            
+            showMessage(`✅ R$ ${amount.toFixed(2)} removidos de ${user.username}!`, 'success');
+            
+            // Limpar campos
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminAmount').value = '';
+        }
+        
+        function criarGincana() {
+            const nome = document.getElementById('gincanaNome').value;
+            const preco = parseFloat(document.getElementById('gincanaPreco').value);
+            const premio = parseFloat(document.getElementById('gincanaPremio').value);
+            
+            if (!nome || !preco || !premio || preco <= 0 || premio <= 0) {
+                showMessage('❌ Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            const novaGincana = {
+                id: Date.now(),
+                nome: nome,
+                descricao: 'Participe e concorra a prêmios incríveis!',
+                preco: preco,
+                premio: premio,
+                participantes: 0,
+                status: 'ativa',
+                criadaEm: new Date().toISOString()
+            };
+            
+            gincanas.push(novaGincana);
+            localStorage.setItem('rifaspay_gincanas', JSON.stringify(gincanas));
+            
+            showMessage(`✅ Gincana "${nome}" criada com sucesso!`, 'success');
+            carregarGincanas();
+            
+            // Limpar campos
+            document.getElementById('gincanaNome').value = '';
+            document.getElementById('gincanaPreco').value = '';
+            document.getElementById('gincanaPremio').value = '';
+        }
+        
+        function gerarUsuariosFake() {
+            const qtd = parseInt(prompt('Quantos usuários fake gerar? (1-30)')) || 10;
+            const quantidade = Math.min(qtd, 30);
+            
+            for (let i = 0; i < quantidade; i++) {
+                const nome = nomesFake[i % nomesFake.length];
+                const username = `user${Date.now() + i}`;
+                const saldo = 10 + Math.random() * 100;
+                const depositado = 50 + Math.random() * 500;
+                
+                usuarios.push({
+                    id: Date.now() + i + 1000,
+                    username: username,
+                    nome: nome,
+                    saldo: saldo,
+                    totalDepositado: depositado,
+                    totalSacado: 0,
+                    totalJogos: Math.floor(Math.random() * 20),
+                    convites: Math.floor(Math.random() * 5),
+                    criadoEm: new Date(Date.now() - Math.random() * 2592000000).toISOString(),
+                    isAdmin: false,
+                    raspadinhas: [],
+                    rifas: []
+                });
+            }
+            
+            salvarDados();
+            carregarRanking();
+            showMessage(`✅ ${quantidade} usuários fake gerados! Ranking atualizado.`, 'success');
+        }
+        
+        function verEstatisticas() {
+            const totalUsuarios = usuarios.length;
+            const totalDepositado = usuarios.reduce((sum, u) => sum + u.totalDepositado, 0);
+            const totalSaldo = usuarios.reduce((sum, u) => sum + u.saldo, 0);
+            const totalSacado = usuarios.reduce((sum, u) => sum + u.totalSacado, 0);
+            const totalJogos = usuarios.reduce((sum, u) => sum + u.totalJogos, 0);
+            const totalTransacoes = transacoes.length;
+            const totalGincanas = gincanas.length;
+            
+            const stats = `
+📊 ESTATÍSTICAS DO SISTEMA:
+
+👥 Usuários totais: ${totalUsuarios}
+💰 Total depositado: R$ ${totalDepositado.toFixed(2)}
+💳 Saldo total: R$ ${totalSaldo.toFixed(2)}
+💸 Total sacado: R$ ${totalSacado.toFixed(2)}
+🎮 Total de jogos: ${totalJogos}
+📈 Transações: ${totalTransacoes}
+🏆 Gincanas ativas: ${totalGincanas}
+
+📅 Sistema online
+✅ Dados salvos localmente
+🎯 ${Math.floor(Math.random() * 500) + 100} jogos hoje
+            `;
+            
+            alert(stats);
+        }
+        
+        function mostrarConvite() {
+            document.getElementById('conviteModal').style.display = 'flex';
+        }
+        
+        function copiarConvite() {
+            const link = document.getElementById('inviteLink').textContent;
+            navigator.clipboard.writeText(link);
+            showMessage('✅ Link copiado! Compartilhe com amigos.', 'success');
+        }
+        
+        // ==================== UTILITÁRIOS ====================
+        function criarDadosIniciais() {
+            // Criar usuário admin
+            usuarios.push({
+                id: 1,
+                username: 'admin',
+                nome: 'Administrador',
+                saldo: 1000,
+                totalDepositado: 1000,
+                totalSacado: 0,
+                totalJogos: 0,
+                convites: 0,
+                criadoEm: new Date().toISOString(),
+                isAdmin: true,
+                raspadinhas: [],
+                rifas: []
+            });
+            
+            // Criar alguns usuários fake iniciais
+            for (let i = 0; i < 15; i++) {
+                const nome = nomesFake[i];
+                usuarios.push({
+                    id: 1000 + i,
+                    username: `jogador${i + 1}`,
+                    nome: nome,
+                    saldo: 10 + Math.random() * 100,
+                    totalDepositado: 50 + Math.random() * 300,
+                    totalSacado: Math.random() * 50,
+                    totalJogos: Math.floor(Math.random() * 15),
+                    convites: Math.floor(Math.random() * 3),
+                    criadoEm: new Date(Date.now() - Math.random() * 2592000000).toISOString(),
+                    isAdmin: false,
+                    raspadinhas: [],
+                    rifas: []
+                });
+            }
+            
+            salvarDados();
+        }
+        
+        function criarGincanasIniciais() {
+            gincanas = [
+                {
+                    id: 1,
+                    nome: "🏆 Desafio dos 7 Dias",
+                    descricao: "Complete desafios diários e ganhe prêmios!",
+                    preco: 15,
+                    premio: 1500,
+                    participantes: 127,
+                    status: "ativa"
+                },
+                {
+                    id: 2,
+                    nome: "⚡ Gincana Relâmpago",
+                    descricao: "Apenas 24 horas para vencer!",
+                    preco: 10,
+                    premio: 800,
+                    participantes: 89,
+                    status: "ativa"
+                },
+                {
+                    id: 3,
+                    nome: "🎯 Torneio de Precisão",
+                    descricao: "Mostre sua habilidade e ganhe!",
+                    preco: 20,
+                    premio: 2500,
+                    participantes: 45,
+                    status: "ativa"
+                }
+            ];
+            
+            localStorage.setItem('rifaspay_gincanas', JSON.stringify(gincanas));
+        }
+        
+        function registrarTransacao(userId, valor, tipo, descricao) {
+            transacoes.push({
+                id: Date.now(),
+                userId: userId,
+                valor: valor,
+                tipo: tipo,
+                descricao: descricao,
+                data: new Date().toISOString()
+            });
+        }
+        
+        function salvarDados() {
+            localStorage.setItem('rifaspay_usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('rifaspay_transacoes', JSON.stringify(transacoes));
+            localStorage.setItem('rifaspay_gincanas', JSON.stringify(gincanas));
+            localStorage.setItem('rifaspay_usuario', JSON.stringify(usuarioAtual));
+        }
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        // ==================== INICIALIZAÇÃO FINAL ====================
+        console.log('✅ RifasPay carregado com sucesso!');
+        console.log('👑 Admin: toque 7x no logo ou senha ADMIN2024');
+        console.log('🎮 Sistema completo de jogos pronto');
+        console.log('💾 Dados salvos no navegador');
+        console.log('🏆 Ranking dinâmico com posições abaixo de 30');
+    </script>
+</body>
+</html>
