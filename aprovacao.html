@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifasPay | Análise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .approval-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .loader {
+            width: 100px;
+            height: 100px;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #4361ee;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .timer {
+            font-size: 48px;
+            font-weight: 800;
+            color: #4361ee;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        .status-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #3a56d4;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .warning-box {
+            background: rgba(239, 71, 111, 0.1);
+            border: 1px solid rgba(239, 71, 111, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #4361ee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="approval-card">
+        <div class="loader"></div>
+        
+        <h2>PAGAMENTO EM ANÁLISE</h2>
+        
+        <div class="timer" id="timer">10:00</div>
+        
+        <div class="status-box">
+            <p style="font-size: 18px; margin-bottom: 10px;">
+                <i class="fas fa-clock"></i> Status: Em Análise
+            </p>
+            <p style="color: #8b95b7;">
+                Estamos verificando seu pagamento de R$25,00
+            </p>
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>
+                <h4>Pagamento Recebido</h4>
+                <p style="color: #8b95b7; font-size: 14px;">Seu pagamento foi identificado</p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>
+                <h4>Análise em Andamento</h4>
+                <p style="color: #8b95b7; font-size: 14px;">Verificando comprovante</p>
+            </div>
+        </div>
+        
+        <div class="step">
+            <div class="step-number">3</div>
+            <div>
+                <h4>Ativação da Conta</h4>
+                <p style="color: #8b95b7; font-size: 14px;">Liberando acesso premium</p>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkStatus()">
+            <i class="fas fa-sync-alt"></i> Verificar Status
+        </button>
+        
+        <button class="btn btn-secondary" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </button>
+
+        <div class="warning-box">
+            <p style="color: #ef476f; font-weight: 600; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle"></i> IMPORTANTE
+            </p>
+            <p style="font-size: 14px;">
+                Se a análise estiver demorando mais que o normal, entre em contato com nosso suporte:
+            </p>
+            <p style="color: #4361ee; font-weight: 600; margin-top: 10px;">
+                @RifasPaySuporte (Telegram)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Timer que nunca termina
+        let time = 600; // 10 minutos em segundos
+        const timerElement = document.getElementById('timer');
+        
+        function updateTimer() {
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+            
+            timerElement.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (time > 0) {
+                time--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                // Quando chega a 0, reinicia
+                time = 600;
+                updateTimer();
+            }
+        }
+        
+        updateTimer();
+        
+        // Verificar status (nunca aprova)
+        function checkStatus() {
+            alert('⏳ A análise ainda está em andamento. Por favor, aguarde.');
+        }
+        
+        // Voltar para depósito
+        function goBack() {
+            window.location.href = 'deposito.html';
+        }
+        
+        // NUNCA APROVA AUTOMATICAMENTE
+        // O usuário fica preso aqui
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RifasPay | Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #4361ee;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #8b95b7;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #4361ee;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #3a56d4;
+            transform: translateY(-2px);
+        }
+
+        .switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #8b95b7;
+        }
+
+        .switch a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .error {
+            background: rgba(239, 71, 111, 0.1);
+            border: 1px solid rgba(239, 71, 111, 0.2);
+            color: #ef476f;
+        }
+
+        .success {
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+            color: #06d6a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="logo">
+            <h1>RifasPay</h1>
+            <p>Sistema Premium de Apostas</p>
+        </div>
+
+        <div class="message error" id="errorMsg" style="display: none;"></div>
+        <div class="message success" id="successMsg" style="display: none;"></div>
+
+        <!-- Formulário de Login -->
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Digite seu e-mail" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Digite sua senha" required>
+            </div>
+            <button type="submit">Entrar na Conta</button>
+        </form>
+
+        <!-- Formulário de Registro -->
+        <form id="registerForm" style="display: none;">
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Nome completo" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="regEmail" placeholder="E-mail" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="regPassword" placeholder="Senha (6+ caracteres)" minlength="6" required>
+            </div>
+            <div class="form-group">
+                <input type="tel" id="phone" placeholder="WhatsApp (11) 99999-9999" required>
+            </div>
+            <button type="submit">Criar Conta Grátis</button>
+        </form>
+
+        <div class="switch">
+            <span id="switchText">Não tem conta?</span>
+            <a href="#" id="switchLink">Crie uma agora</a>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar mensagem
+        function showMessage(text, type) {
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            
+            if (type === 'error') {
+                errorMsg.textContent = text;
+                errorMsg.style.display = 'block';
+                successMsg.style.display = 'none';
+                
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                }, 3000);
+            } else {
+                successMsg.textContent = text;
+                successMsg.style.display = 'block';
+                errorMsg.style.display = 'none';
+                
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Alternar entre login e registro
+        document.getElementById('switchLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const switchText = document.getElementById('switchText');
+            const switchLink = document.getElementById('switchLink');
+            
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                switchText.textContent = 'Não tem conta?';
+                switchLink.textContent = 'Crie uma agora';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                switchText.textContent = 'Já tem conta?';
+                switchLink.textContent = 'Faça login';
+            }
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showMessage('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            showMessage('Login realizado com sucesso!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'deposito.html';
+            }, 1000);
+        });
+
+        // Registro
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (!name || !email || !password || !phone) {
+                showMessage('Preencha todos os campos', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('A senha deve ter pelo menos 6 caracteres', 'error');
+                return;
+            }
+            
+            showMessage('Conta criada com sucesso!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'deposito.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
